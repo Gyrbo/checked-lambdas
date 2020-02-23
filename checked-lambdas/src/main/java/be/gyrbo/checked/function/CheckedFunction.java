@@ -8,39 +8,38 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 @FunctionalInterface
-public interface CheckedPredicate<T, EX extends Exception> {
+public interface CheckedFunction<T, R, EX extends Exception> {
 
-	boolean test(T t) throws EX;
+	R apply(T t) throws EX;
 	
 	/// Methods to deal with exceptions
 	
 	// Convert to a regular Predicate
 	
 	/**
-	 * This causes any unchecked exceptions to still by thrown when the predicate is
+	 * This causes any unchecked exceptions to still by thrown when the function is
 	 * invoked, but it simply does not declare it.
 	 * <p>
 	 * <b>You should probably never use this</b>. It is mainly useful for libraries
 	 * handling the exception in some other way.
 	 */
-	default Predicate<T> sneakyThrow() {
+	default Function<T, R> sneakyThrow() {
 		return t -> {
 			@SuppressWarnings("unchecked")
-			CheckedPredicate<T, RuntimeException> sneaky = (CheckedPredicate<T, RuntimeException>) this;
-			return sneaky.test(t);
+			CheckedFunction<T, R, RuntimeException> sneaky = (CheckedFunction<T, R, RuntimeException>) this;
+			return sneaky.apply(t);
 		};
 	}
 	
 	/**
 	 * In case an exception occurs, an empty Optional is returned
 	 */
-	default Function<T, Optional<Boolean>> optional() {
+	default Function<T, Optional<R>> optional() {
 		return t -> {
 			try {
-				return Optional.of(test(t));
+				return Optional.of(apply(t));
 			} catch (Exception e) {
 				return Optional.empty();
 			}
@@ -48,34 +47,17 @@ public interface CheckedPredicate<T, EX extends Exception> {
 	}
 	
 	/**
-	 * In case an exception occurs, the supplied predicate will be used as the
-	 * result. Otherwise the supplied predicate is never evaluated.
+	 * In case an exception occurs, the supplied function will be used as the
+	 * result. Otherwise the supplied function is never evaluated.
 	 */
-	default Predicate<T> fallbackTo(Predicate<? super T> other) {
+	default Function<T, R> fallbackTo(Function<? super T, ? extends R> other) {
         Objects.requireNonNull(other);
         
 		return t -> {
 			try {
-				return test(t);
+				return apply(t);
 			} catch (Exception e) {
-				return other.test(t);
-			}
-		};
-	}
-	
-	/**
-	 * This functions as a short-circuiting or. When an exception occurs during the
-	 * evaluation of this predicate, the supplied predicate will be used as the
-	 * result.
-	 */
-	default Predicate<T> fallbackToOr(Predicate<? super T> other) {
-        Objects.requireNonNull(other);
-        
-		return t -> {
-			try {
-				return test(t) || other.test(t);
-			} catch (Exception e) {
-				return other.test(t);
+				return other.apply(t);
 			}
 		};
 	}
@@ -84,10 +66,10 @@ public interface CheckedPredicate<T, EX extends Exception> {
 	 * In case an exception occurs, the supplied value will be used as the
 	 * result.
 	 */
-	default Predicate<T> orReturn(boolean value) {
+	default Function<T, R> orReturn(R value) {
 		return t -> {
 			try {
-				return test(t);
+				return apply(t);
 			} catch (Exception e) {
 				return value;
 			}
@@ -97,12 +79,12 @@ public interface CheckedPredicate<T, EX extends Exception> {
 	/**
 	 * Rethrow any checked exceptions as unchecked exceptions by passing through the supplied mapper. 
 	 */
-	default Predicate<T> rethrowUnchecked(Function<? super EX, ? extends RuntimeException> mapper) {
+	default Function<T, R> rethrowUnchecked(Function<? super EX, ? extends RuntimeException> mapper) {
         Objects.requireNonNull(mapper);
         
 		return t -> {
 			try {
-				return this.test(t);
+				return this.apply(t);
 			} catch(RuntimeException ex) {
 				throw ex;
 			} catch (Exception e) {
@@ -117,12 +99,12 @@ public interface CheckedPredicate<T, EX extends Exception> {
 	/**
 	 * Rethrow any checked exceptions by passing through the supplied mapper. 
 	 */
-	default <EX2 extends Exception> CheckedPredicate<T, EX2> rethrow(Function<? super EX, EX2> mapper) {
+	default <EX2 extends Exception> CheckedFunction<T, R, EX2> rethrow(Function<? super EX, EX2> mapper) {
         Objects.requireNonNull(mapper);
         
 		return t -> {
 			try {
-				return this.test(t);
+				return this.apply(t);
 			} catch(RuntimeException ex) {
 				throw ex;
 			} catch (Exception e) {
@@ -137,12 +119,12 @@ public interface CheckedPredicate<T, EX extends Exception> {
 	 * Passes any checked exceptions to the supplied exception handler. Afterwards,
 	 * the exception is rethrown.
 	 */
-	default CheckedPredicate<T, EX> except(Consumer<? super EX> exceptionHandler) {	
+	default CheckedFunction<T, R, EX> except(Consumer<? super EX> exceptionHandler) {	
         Objects.requireNonNull(exceptionHandler);
         
 		return t -> {
 			try {
-				return this.test(t);
+				return this.apply(t);
 			} catch(RuntimeException ex) {
 				throw ex;
 			} catch (Exception e) {
@@ -158,14 +140,14 @@ public interface CheckedPredicate<T, EX extends Exception> {
 	 * Passes any checked exceptions that match the specified type to the supplied
 	 * exception handler. Afterwards, the exception is rethrown.
 	 */
-	default <EX2 extends EX> CheckedPredicate<T, EX> except(
+	default <EX2 extends EX> CheckedFunction<T, R, EX> except(
 			Class<EX2> cls, Consumer<? super EX2> exceptionHandler) {
         Objects.requireNonNull(cls);
         Objects.requireNonNull(exceptionHandler);
         
 		return t -> {
 			try {
-				return this.test(t);
+				return this.apply(t);
 			} catch(RuntimeException ex) {
 				throw ex;
 			} catch (Exception e) {
@@ -183,19 +165,19 @@ public interface CheckedPredicate<T, EX extends Exception> {
 	 * Passes any unchecked exceptions to the supplied exception handler.
 	 * Afterwards, the exception is rethrown.
 	 */
-	default CheckedPredicate<T, EX> exceptUnchecked(
+	default CheckedFunction<T, R, EX> exceptUnchecked(
 			Consumer<? super RuntimeException> exceptionHandler) {
 		return exceptUnchecked(RuntimeException.class, exceptionHandler);
 	}
 	
-	default <REX extends RuntimeException> CheckedPredicate<T, EX> exceptUnchecked(
+	default <REX extends RuntimeException> CheckedFunction<T, R, EX> exceptUnchecked(
 			Class<REX> cls, Consumer<? super REX> exceptionHandler) {
         Objects.requireNonNull(cls);
         Objects.requireNonNull(exceptionHandler);        
         
 		return t -> {
 			try {
-				return this.test(t);
+				return this.apply(t);
 			} catch(RuntimeException e) {
 				if(cls.isInstance(e)) {
 					exceptionHandler.accept(cls.cast(e));					
@@ -213,49 +195,27 @@ public interface CheckedPredicate<T, EX extends Exception> {
 	 * Passes any unchecked exceptions that match the specified type to the supplied
 	 * exception handler. Afterwards, the exception is rethrown.
 	 */
-	default CheckedPredicate<T, EX> orTry(CheckedPredicate<? super T, ? extends EX> other) {
+	default CheckedFunction<T, R, EX> orTry(CheckedFunction<? super T, R, ? extends EX> other) {
         Objects.requireNonNull(other);
         
 		return t -> {
 			try {
-				return test(t);
+				return apply(t);
 			} catch (Exception e) {
-				return other.test(t);
+				return other.apply(t);
 			}
 		};
 	}
 	
-	/// Utility methods from Predicate
-	
-    /**
-     * Short-circuiting AND operator. Any thrown exceptions are not influenced.
-     */
-    default CheckedPredicate<T, EX> and(CheckedPredicate<? super T, ? extends EX> other) {
-        Objects.requireNonNull(other);
-        
-        return t -> test(t) && other.test(t);
+	/// Utility methods from Function
+
+    default <V> CheckedFunction<V, R, EX> compose(CheckedFunction<? super V, ? extends T, EX> before) {
+        Objects.requireNonNull(before);
+        return (V v) -> apply(before.apply(v));
     }
 
-    /**
-     * Negates the result. Any thrown exceptions are not influenced.
-     */
-    default CheckedPredicate<T, EX> negate() {
-        return t -> !test(t);
+    default <V> CheckedFunction<T, V, EX> andThen(Function<? super R, ? extends V> after) {
+        Objects.requireNonNull(after);
+        return (T t) -> after.apply(apply(t));
     }
-
-    /**
-	 * Short-circuiting OR operator. Any thrown exceptions are not influenced.
-	 * <p>
-	 * See fallbackToOr() if you want the supplied
-	 *      predicate to also be used  as an alternative in case of exceptions.
-	 * <p>
-	 * See orTry() if you want the supplied predicate to
-	 *      be used <b>only</b> in case of exceptions.
-	 */
-    default CheckedPredicate<T, EX> or(CheckedPredicate<? super T, ? extends EX> other) {
-        Objects.requireNonNull(other);
-        
-        return t -> test(t) || other.test(t);
-    }
-	
 }

@@ -6,13 +6,33 @@
 		xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>be.gyrbo</groupId>
+	<groupId>be.gyrbo.checked</groupId>
 	<artifactId>checked-lambdas</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>checked-lambdas</name>
+	<description>This library provides a convenient way to deal with checked exceptions in lambdas and Java 8 streams</description>
 	<url>https://github.com/Gyrbo/checked-lambdas</url>
+	<licenses>
+		<license>
+			<name>Mozilla Public License 2.0</name>
+			<url>https://mozilla.org/MPL/2.0/</url>
+		</license>
+	</licenses>
+	
+	<developers>
+		<developer>
+			<name>Dennis Bollyn</name>
+			<organizationUrl>https://github.com/Gyrbo</organizationUrl>
+		</developer>
+	</developers>
+	
+	<scm>
+		<connection>scm:git:git://github.com:Gyrbo/checked-lambdas.git</connection>
+		<developerConnection>scm:git:ssh://github.com:Gyrbo/checked-lambdas.git</developerConnection>
+		<url>https://github.com/Gyrbo/checked-lambdas/tree/master</url>
+	</scm>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -28,4 +48,49 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.2.1</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.9.1</version>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<version>1.5</version>
+				<executions>
+					<execution>
+						<id>sign-artifacts</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>

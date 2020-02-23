@@ -28,7 +28,7 @@ public class CheckedPredicateTest {
 	void testFallback() {
 		Predicate<String> predicate =
 				Checked.predicate(CheckedPredicateTest::throwParseException)
-			.fallbackTo(true);
+			.orReturn(true);
 		assertTrue(predicate.test(INPUT));
 	}
 	
@@ -72,7 +72,7 @@ public class CheckedPredicateTest {
 		Checked.predicate(CheckedPredicateTest::throwParseException)
 			.rethrow(DummyException::new)
 			.exceptUnchecked(DummyException.class, e -> dummyExceptionSeen.set(true))
-			.fallbackTo(true)
+			.orReturn(true)
 			.test(INPUT);
 		
 		assertTrue(dummyExceptionSeen.get());

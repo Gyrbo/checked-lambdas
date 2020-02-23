@@ -4,165 +4,157 @@
 
 package be.gyrbo.checked.stream;
 
-import java.util.Comparator;
-import java.util.Optional;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.BinaryOperator;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.IntFunction;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-import java.util.stream.Collector;
-import java.util.stream.Stream;
+import java.util.*;
+import java.util.function.*;
+import java.util.stream.*;
 
-import be.gyrbo.checked.function.CheckedPredicate;
+import be.gyrbo.checked.function.*;
 
-public class CheckedStream<T, EX extends Exception> {
-	private final Stream<T> delegate;
-	private final Class<EX> exception;
+public class CheckedStream<T, EX extends Exception> extends CheckedBaseStream<Stream<T>, EX> {
 	
-	private CheckedStream(Stream<T> delegate, Class<EX> exception) {
-		this.delegate = delegate;
-		this.exception = exception;
-	}
-	
-	private <U> CheckedStream<U, EX> fromStream(Stream<U> delegate) {
-		return new CheckedStream<U, EX>(delegate, exception);
+	protected CheckedStream(Stream<T> delegate, Class<EX> exception) {
+		super(delegate, exception);
 	}
 	
 	public static <T, EX extends Exception> CheckedStream<T, EX> of(Stream<T> delegate, Class<EX> exception) {
 		return new CheckedStream<T, EX>(delegate, exception);
 	}
+	
+	// Terminal operations
 
-	public CheckedStream<T, EX> filter(CheckedPredicate<? super T, ? extends EX> predicate) {
-		return fromStream(delegate.filter(predicate.sneakyThrow()));
+	public long count() throws EX {
+		return delegate.count();
 	}
 
-	public <R> CheckedStream<R, EX> map(Function<? super T, ? extends R> mapper) {
-		return fromStream(delegate.map(mapper));
+	public Optional<T> min(Comparator<? super T> p0) throws EX {
+		return delegate.min(p0);
 	}
 
-	/*public IntStream mapToInt(ToIntFunction<? super T> mapper) {
-		return delegate.mapToInt(mapper);
+	public Optional<T> max(Comparator<? super T> p0) throws EX {
+		return delegate.max(p0);
 	}
 
-	public LongStream mapToLong(ToLongFunction<? super T> mapper) {
-		return delegate.mapToLong(mapper);
-	}
-
-	public DoubleStream mapToDouble(ToDoubleFunction<? super T> mapper) {
-		return delegate.mapToDouble(mapper);
-	}*/
-
-	public <R> CheckedStream<R, EX> flatMap(Function<? super T, ? extends Stream<? extends R>> mapper) {
-		return fromStream(delegate.flatMap(mapper));
-	}
-
-	/*public IntStream flatMapToInt(Function<? super T, ? extends IntStream> mapper) {
-		return delegate.flatMapToInt(mapper);
-	}
-
-	public LongStream flatMapToLong(Function<? super T, ? extends LongStream> mapper) {
-		return delegate.flatMapToLong(mapper);
-	}
-
-	public DoubleStream flatMapToDouble(Function<? super T, ? extends DoubleStream> mapper) {
-		return delegate.flatMapToDouble(mapper);
-	}*/
-
-	public CheckedStream<T, EX> sorted(Comparator<? super T> comparator)  {
-		return fromStream(delegate.sorted(comparator));
-	}
-
-	public CheckedStream<T, EX> peek(Consumer<? super T> action) {
-		return fromStream(delegate.peek(action));
-	}
-
-	public CheckedStream<T, EX> limit(long maxSize) {
-		return fromStream(delegate.limit(maxSize));
-	}
-
-	public CheckedStream<T, EX> skip(long n) {
-		return fromStream(delegate.skip(n));
-	}
-
-	public CheckedStream<T, EX> onClose(Runnable closeHandler) {
-		return fromStream(delegate.onClose(closeHandler));
-	}
-
-	public void close() throws EX {
-		delegate.close();
-	}
-
-	public void forEach(Consumer<? super T> action) throws EX {
-		delegate.forEach(action);
-	}
-
-	public void forEachOrdered(Consumer<? super T> action) throws EX {
-		delegate.forEachOrdered(action);
+	public <A> A[] toArray(IntFunction<A[]> p0) throws EX {
+		return delegate.toArray(p0);
 	}
 
 	public Object[] toArray() throws EX {
 		return delegate.toArray();
 	}
 
-	public <A> A[] toArray(IntFunction<A[]> generator) throws EX {
-		return delegate.toArray(generator);
+	public <R> R collect(Supplier<R> p0,
+			BiConsumer<R, ? super T> p1,
+			BiConsumer<R, R> p2) throws EX {
+		return delegate.collect(p0, p1, p2);
 	}
 
-	public T reduce(T identity, BinaryOperator<T> accumulator) throws EX {
-		return delegate.reduce(identity, accumulator);
+	public <R, A> R collect(Collector<? super T, A, R> p0) throws EX {
+		return delegate.collect(p0);
 	}
 
-	public Optional<T> reduce(BinaryOperator<T> accumulator) throws EX {
-		return delegate.reduce(accumulator);
+	public void forEach(Consumer<? super T> p0) throws EX {
+		delegate.forEach(p0);
 	}
 
-	public <U> U reduce(U identity, BiFunction<U, ? super T, U> accumulator, BinaryOperator<U> combiner) throws EX {
-		return delegate.reduce(identity, accumulator, combiner);
+	public Optional<T> reduce(BinaryOperator<T> p0) throws EX {
+		return delegate.reduce(p0);
 	}
 
-	public <R> R collect(Supplier<R> supplier, BiConsumer<R, ? super T> accumulator, BiConsumer<R, R> combiner) throws EX {
-		return delegate.collect(supplier, accumulator, combiner);
+	public <U> U reduce(U p0,
+			BiFunction<U, ? super T, U> p1,
+			BinaryOperator<U> p2) throws EX {
+		return delegate.reduce(p0, p1, p2);
 	}
 
-	public <R, A> R collect(Collector<? super T, A, R> collector) throws EX {
-		return delegate.collect(collector);
+	public T reduce(T p0,
+			BinaryOperator<T> p1) throws EX {
+		return delegate.reduce(p0, p1);
 	}
 
-	public Optional<T> min(Comparator<? super T> comparator) throws EX {
-		return delegate.min(comparator);
+	public boolean allMatch(Predicate<? super T> p0) throws EX {
+		return delegate.allMatch(p0);
 	}
 
-	public Optional<T> max(Comparator<? super T> comparator) throws EX {
-		return delegate.max(comparator);
+	public boolean anyMatch(Predicate<? super T> p0) throws EX {
+		return delegate.anyMatch(p0);
 	}
 
-	public long count() throws EX {
-		return delegate.count();
-	}
-
-	public boolean anyMatch(Predicate<? super T> predicate) throws EX {
-		return delegate.anyMatch(predicate);
-	}
-
-	public boolean allMatch(Predicate<? super T> predicate) throws EX {
-		return delegate.allMatch(predicate);
-	}
-
-	public boolean noneMatch(Predicate<? super T> predicate) throws EX {
-		return delegate.noneMatch(predicate);
+	public Optional<T> findAny() throws EX {
+		return delegate.findAny();
 	}
 
 	public Optional<T> findFirst() throws EX {
 		return delegate.findFirst();
 	}
 
-	public Optional<T> findAny() throws EX {
-		return delegate.findAny();
+	public void forEachOrdered(Consumer<? super T> p0) throws EX {
+		delegate.forEachOrdered(p0);
 	}
-	
-	
+
+	public boolean noneMatch(Predicate<? super T> p0) throws EX {
+		return delegate.noneMatch(p0);
+	}
+
+	// Intermediate operations
+
+	public CheckedStream<T, EX> limit(long p0) {
+		return fromStream(delegate.limit(p0));
+	}
+
+	public CheckedStream<T, EX> skip(long p0) {
+		return fromStream(delegate.skip(p0));
+	}
+
+	public CheckedStream<T, EX> peek(Consumer<? super T> p0) {
+		return fromStream(delegate.peek(p0));
+	}
+
+	public CheckedStream<T, EX> filter(CheckedPredicate<? super T, EX> p0) {
+		return fromStream(delegate.filter(p0.sneakyThrow()));
+	}
+
+	public <R> CheckedStream<R, EX> map(CheckedFunction<? super T, ? extends R, EX> p0) {
+		return fromStream(delegate.map(p0.sneakyThrow()));
+	}
+
+	public CheckedStream<T, EX> distinct() {
+		return fromStream(delegate.distinct());
+	}
+
+	public <R> CheckedStream<R, EX> flatMap(CheckedFunction<? super T, ? extends Stream<? extends R>, EX> p0) {
+		return fromStream(delegate.flatMap(p0.sneakyThrow()));
+	}
+
+	public CheckedDoubleStream<EX> flatMapToDouble(CheckedFunction<? super T, ? extends DoubleStream, EX> p0) {
+		return fromStream(delegate.flatMapToDouble(p0.sneakyThrow()));
+	}
+
+	public CheckedIntStream<EX> flatMapToInt(CheckedFunction<? super T, ? extends IntStream, EX> p0) {
+		return fromStream(delegate.flatMapToInt(p0.sneakyThrow()));
+	}
+
+	public CheckedLongStream<EX> flatMapToLong(CheckedFunction<? super T, ? extends LongStream, EX> p0) {
+		return fromStream(delegate.flatMapToLong(p0.sneakyThrow()));
+	}
+
+	public CheckedDoubleStream<EX> mapToDouble(CheckedToDoubleFunction<? super T, EX> p0) {
+		return fromStream(delegate.mapToDouble(p0.sneakyThrow()));
+	}
+
+	public CheckedIntStream<EX> mapToInt(CheckedToIntFunction<? super T, EX> p0) {
+		return fromStream(delegate.mapToInt(p0.sneakyThrow()));
+	}
+
+	public CheckedLongStream<EX> mapToLong(CheckedToLongFunction<? super T, EX> p0) {
+		return fromStream(delegate.mapToLong(p0.sneakyThrow()));
+	}
+
+	public CheckedStream<T, EX> sorted() {
+		return fromStream(delegate.sorted());
+	}
+
+	public CheckedStream<T, EX> sorted(Comparator<? super T> p0) {
+		return fromStream(delegate.sorted(p0));
+	}
+
 }
