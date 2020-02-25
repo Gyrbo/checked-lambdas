@@ -14,7 +14,7 @@ import java.util.function.LongToDoubleFunction;
 @FunctionalInterface
 public interface CheckedLongToDoubleFunction<EX extends Exception> {
 
-	double applyAsDouble(long t) throws EX;
+	double applyOrThrow(long t) throws EX;
 	
 	/// Methods to deal with exceptions
 	
@@ -31,181 +31,195 @@ public interface CheckedLongToDoubleFunction<EX extends Exception> {
 		return t -> {
 			@SuppressWarnings("unchecked")
 			CheckedLongToDoubleFunction<RuntimeException> sneaky = (CheckedLongToDoubleFunction<RuntimeException>) this;
-			return sneaky.applyAsDouble(t);
+			return sneaky.applyOrThrow(t);
 		};
+	}	
+	
+	@FunctionalInterface
+	public interface Adapter<EX extends Exception> extends CheckedLongToDoubleFunction<EX>, LongToDoubleFunction {
+		default double applyOrThrow(long t) throws EX {
+			return applyOrThrow(t);
+		}
+		
+		default LongToDoubleFunction sneakyThrow() {
+			return this;
+		}
 	}
 	
-	/**
-	 * In case an exception occurs, an empty Optional is returned
-	 */
-	default LongFunction<OptionalDouble> optional() {
-		return t -> {
-			try {
-				return OptionalDouble.of(applyAsDouble(t));
-			} catch (Exception e) {
-				return OptionalDouble.empty();
-			}
-		};
-	}
+	public interface Helper<EX extends Exception> extends CheckedLongToDoubleFunction<EX> {
 	
-	/**
-	 * In case an exception occurs, the supplied function will be used as the
-	 * result. Otherwise the supplied function is never evaluated.
-	 */
-	default LongToDoubleFunction fallbackTo(LongToDoubleFunction other) {
-        Objects.requireNonNull(other);
-        
-		return t -> {
-			try {
-				return applyAsDouble(t);
-			} catch (Exception e) {
-				return other.applyAsDouble(t);
-			}
-		};
-	}
-	
-	/**
-	 * In case an exception occurs, the supplied value will be used as the
-	 * result.
-	 */
-	default LongToDoubleFunction orReturn(double value) {
-		return t -> {
-			try {
-				return applyAsDouble(t);
-			} catch (Exception e) {
-				return value;
-			}
-		};
-	}
-	
-	/**
-	 * Rethrow any checked exceptions as unchecked exceptions by passing through the supplied mapper. 
-	 */
-	default LongToDoubleFunction rethrowUnchecked(Function<? super EX, ? extends RuntimeException> mapper) {
-        Objects.requireNonNull(mapper);
-        
-		return t -> {
-			try {
-				return this.applyAsDouble(t);
-			} catch(RuntimeException ex) {
-				throw ex;
-			} catch (Exception e) {
-				@SuppressWarnings("unchecked")
-				EX ex = (EX) e;
-				throw mapper.apply(ex);
-			}
-		};
-	}
-	
-	// Convert in some way, but still not fully handled
-	/**
-	 * Rethrow any checked exceptions by passing through the supplied mapper. 
-	 */
-	default <EX2 extends Exception> CheckedLongToDoubleFunction<EX2> rethrow(Function<? super EX, EX2> mapper) {
-        Objects.requireNonNull(mapper);
-        
-		return t -> {
-			try {
-				return this.applyAsDouble(t);
-			} catch(RuntimeException ex) {
-				throw ex;
-			} catch (Exception e) {
-				@SuppressWarnings("unchecked")
-				EX ex = (EX) e;
-				throw mapper.apply(ex);
-			}
-		};
-	}
-	
-	/**
-	 * Passes any checked exceptions to the supplied exception handler. Afterwards,
-	 * the exception is rethrown.
-	 */
-	default CheckedLongToDoubleFunction<EX> except(Consumer<? super EX> exceptionHandler) {	
-        Objects.requireNonNull(exceptionHandler);
-        
-		return t -> {
-			try {
-				return this.applyAsDouble(t);
-			} catch(RuntimeException ex) {
-				throw ex;
-			} catch (Exception e) {
-				@SuppressWarnings("unchecked")
-				EX ex = (EX) e;
-				exceptionHandler.accept(ex);
-				throw ex;
-			}
-		};
-	}
-	
-	/**
-	 * Passes any checked exceptions that match the specified type to the supplied
-	 * exception handler. Afterwards, the exception is rethrown.
-	 */
-	default <EX2 extends EX> CheckedLongToDoubleFunction<EX> except(
-			Class<EX2> cls, Consumer<? super EX2> exceptionHandler) {
-        Objects.requireNonNull(cls);
-        Objects.requireNonNull(exceptionHandler);
-        
-		return t -> {
-			try {
-				return this.applyAsDouble(t);
-			} catch(RuntimeException ex) {
-				throw ex;
-			} catch (Exception e) {
-				if(cls.isInstance(e)) {
-					exceptionHandler.accept(cls.cast(e));					
+		/**
+		 * In case an exception occurs, an empty Optional is returned
+		 */
+		default LongFunction<OptionalDouble> optional() {
+			return t -> {
+				try {
+					return OptionalDouble.of(applyOrThrow(t));
+				} catch (Exception e) {
+					return OptionalDouble.empty();
 				}
-				@SuppressWarnings("unchecked")
-				EX ex = (EX) e;
-				throw ex;
-			}
-		};
-	}
-	
-	/**
-	 * Passes any unchecked exceptions to the supplied exception handler.
-	 * Afterwards, the exception is rethrown.
-	 */
-	default CheckedLongToDoubleFunction<EX> exceptUnchecked(
-			Consumer<? super RuntimeException> exceptionHandler) {
-		return exceptUnchecked(RuntimeException.class, exceptionHandler);
-	}
-	
-	default <REX extends RuntimeException> CheckedLongToDoubleFunction<EX> exceptUnchecked(
-			Class<REX> cls, Consumer<? super REX> exceptionHandler) {
-        Objects.requireNonNull(cls);
-        Objects.requireNonNull(exceptionHandler);        
-        
-		return t -> {
-			try {
-				return this.applyAsDouble(t);
-			} catch(RuntimeException e) {
-				if(cls.isInstance(e)) {
-					exceptionHandler.accept(cls.cast(e));					
+			};
+		}
+		
+		/**
+		 * In case an exception occurs, the supplied function will be used as the
+		 * result. Otherwise the supplied function is never evaluated.
+		 */
+		default CheckedLongToDoubleFunction.Adapter<EX> fallbackTo(LongToDoubleFunction other) {
+	        Objects.requireNonNull(other);
+	        
+			return t -> {
+				try {
+					return applyOrThrow(t);
+				} catch (Exception e) {
+					return other.applyAsDouble(t);
 				}
-				throw e;
-			} catch (Exception e) {
-				@SuppressWarnings("unchecked")
-				EX ex = (EX) e;
-				throw ex;
-			}
-		};
-	}
-	
-	/**
-	 * Passes any unchecked exceptions that match the specified type to the supplied
-	 * exception handler. Afterwards, the exception is rethrown.
-	 */
-	default CheckedLongToDoubleFunction<EX> orTry(CheckedLongToDoubleFunction<? extends EX> other) {
-        Objects.requireNonNull(other);
-        
-		return t -> {
-			try {
-				return applyAsDouble(t);
-			} catch (Exception e) {
-				return other.applyAsDouble(t);
-			}
-		};
+			};
+		}
+		
+		/**
+		 * In case an exception occurs, the supplied value will be used as the
+		 * result.
+		 */
+		default CheckedLongToDoubleFunction.Adapter<EX> orReturn(double value) {
+			return t -> {
+				try {
+					return applyOrThrow(t);
+				} catch (Exception e) {
+					return value;
+				}
+			};
+		}
+		
+		/**
+		 * Rethrow any checked exceptions as unchecked exceptions by passing through the supplied mapper. 
+		 */
+		default CheckedLongToDoubleFunction.Adapter<EX> rethrowUnchecked(Function<? super EX, ? extends RuntimeException> mapper) {
+	        Objects.requireNonNull(mapper);
+	        
+			return t -> {
+				try {
+					return this.applyOrThrow(t);
+				} catch(RuntimeException ex) {
+					throw ex;
+				} catch (Exception e) {
+					@SuppressWarnings("unchecked")
+					EX ex = (EX) e;
+					throw mapper.apply(ex);
+				}
+			};
+		}
+		
+		// Convert in some way, but still not fully handled
+		/**
+		 * Rethrow any checked exceptions by passing through the supplied mapper. 
+		 */
+		default <EX2 extends Exception> CheckedLongToDoubleFunction.Helper<EX2> rethrow(Function<? super EX, EX2> mapper) {
+	        Objects.requireNonNull(mapper);
+	        
+			return t -> {
+				try {
+					return this.applyOrThrow(t);
+				} catch(RuntimeException ex) {
+					throw ex;
+				} catch (Exception e) {
+					@SuppressWarnings("unchecked")
+					EX ex = (EX) e;
+					throw mapper.apply(ex);
+				}
+			};
+		}
+		
+		/**
+		 * Passes any checked exceptions to the supplied exception handler. Afterwards,
+		 * the exception is rethrown.
+		 */
+		default CheckedLongToDoubleFunction.Helper<EX> except(Consumer<? super EX> exceptionHandler) {	
+	        Objects.requireNonNull(exceptionHandler);
+	        
+			return t -> {
+				try {
+					return this.applyOrThrow(t);
+				} catch(RuntimeException ex) {
+					throw ex;
+				} catch (Exception e) {
+					@SuppressWarnings("unchecked")
+					EX ex = (EX) e;
+					exceptionHandler.accept(ex);
+					throw ex;
+				}
+			};
+		}
+		
+		/**
+		 * Passes any checked exceptions that match the specified type to the supplied
+		 * exception handler. Afterwards, the exception is rethrown.
+		 */
+		default <EX2 extends EX> CheckedLongToDoubleFunction.Helper<EX> except(
+				Class<EX2> cls, Consumer<? super EX2> exceptionHandler) {
+	        Objects.requireNonNull(cls);
+	        Objects.requireNonNull(exceptionHandler);
+	        
+			return t -> {
+				try {
+					return this.applyOrThrow(t);
+				} catch(RuntimeException ex) {
+					throw ex;
+				} catch (Exception e) {
+					if(cls.isInstance(e)) {
+						exceptionHandler.accept(cls.cast(e));					
+					}
+					@SuppressWarnings("unchecked")
+					EX ex = (EX) e;
+					throw ex;
+				}
+			};
+		}
+		
+		/**
+		 * Passes any unchecked exceptions to the supplied exception handler.
+		 * Afterwards, the exception is rethrown.
+		 */
+		default CheckedLongToDoubleFunction.Helper<EX> exceptUnchecked(
+				Consumer<? super RuntimeException> exceptionHandler) {
+			return exceptUnchecked(RuntimeException.class, exceptionHandler);
+		}
+		
+		default <REX extends RuntimeException> CheckedLongToDoubleFunction.Helper<EX> exceptUnchecked(
+				Class<REX> cls, Consumer<? super REX> exceptionHandler) {
+	        Objects.requireNonNull(cls);
+	        Objects.requireNonNull(exceptionHandler);        
+	        
+			return t -> {
+				try {
+					return this.applyOrThrow(t);
+				} catch(RuntimeException e) {
+					if(cls.isInstance(e)) {
+						exceptionHandler.accept(cls.cast(e));					
+					}
+					throw e;
+				} catch (Exception e) {
+					@SuppressWarnings("unchecked")
+					EX ex = (EX) e;
+					throw ex;
+				}
+			};
+		}
+		
+		/**
+		 * Passes any unchecked exceptions that match the specified type to the supplied
+		 * exception handler. Afterwards, the exception is rethrown.
+		 */
+		default CheckedLongToDoubleFunction.Helper<EX> orTry(CheckedLongToDoubleFunction<? extends EX> other) {
+	        Objects.requireNonNull(other);
+	        
+			return t -> {
+				try {
+					return applyOrThrow(t);
+				} catch (Exception e) {
+					return other.applyOrThrow(t);
+				}
+			};
+		}
 	}
 }

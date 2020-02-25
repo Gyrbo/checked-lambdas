@@ -13,7 +13,7 @@ import java.util.function.ToIntFunction;
 @FunctionalInterface
 public interface CheckedToIntFunction<T, EX extends Exception> {
 
-	int applyAsInt(T t) throws EX;
+	int applyOrThrow(T t) throws EX;
 	
 	/// Methods to deal with exceptions
 	
@@ -30,181 +30,195 @@ public interface CheckedToIntFunction<T, EX extends Exception> {
 		return t -> {
 			@SuppressWarnings("unchecked")
 			CheckedToIntFunction<T, RuntimeException> sneaky = (CheckedToIntFunction<T, RuntimeException>) this;
-			return sneaky.applyAsInt(t);
+			return sneaky.applyOrThrow(t);
 		};
+	}	
+	
+	@FunctionalInterface
+	public interface Adapter<T, EX extends Exception> extends CheckedToIntFunction<T, EX>, ToIntFunction<T> {
+		default int applyOrThrow(T t) throws EX {
+			return applyOrThrow(t);
+		}
+		
+		default ToIntFunction<T> sneakyThrow() {
+			return this;
+		}
 	}
 	
-	/**
-	 * In case an exception occurs, an empty Optional is returned
-	 */
-	default Function<T, OptionalInt> optional() {
-		return t -> {
-			try {
-				return OptionalInt.of(applyAsInt(t));
-			} catch (Exception e) {
-				return OptionalInt.empty();
-			}
-		};
-	}
+	public interface Helper<T, EX extends Exception> extends CheckedToIntFunction<T, EX> {
 	
-	/**
-	 * In case an exception occurs, the supplied function will be used as the
-	 * result. Otherwise the supplied function is never evaluated.
-	 */
-	default ToIntFunction<T> fallbackTo(ToIntFunction<? super T> other) {
-        Objects.requireNonNull(other);
-        
-		return t -> {
-			try {
-				return applyAsInt(t);
-			} catch (Exception e) {
-				return other.applyAsInt(t);
-			}
-		};
-	}
-	
-	/**
-	 * In case an exception occurs, the supplied value will be used as the
-	 * result.
-	 */
-	default ToIntFunction<T> orReturn(int value) {
-		return t -> {
-			try {
-				return applyAsInt(t);
-			} catch (Exception e) {
-				return value;
-			}
-		};
-	}
-	
-	/**
-	 * Rethrow any checked exceptions as unchecked exceptions by passing through the supplied mapper. 
-	 */
-	default ToIntFunction<T> rethrowUnchecked(Function<? super EX, ? extends RuntimeException> mapper) {
-        Objects.requireNonNull(mapper);
-        
-		return t -> {
-			try {
-				return this.applyAsInt(t);
-			} catch(RuntimeException ex) {
-				throw ex;
-			} catch (Exception e) {
-				@SuppressWarnings("unchecked")
-				EX ex = (EX) e;
-				throw mapper.apply(ex);
-			}
-		};
-	}
-	
-	// Convert in some way, but still not fully handled
-	/**
-	 * Rethrow any checked exceptions by passing through the supplied mapper. 
-	 */
-	default <EX2 extends Exception> CheckedToIntFunction<T, EX2> rethrow(Function<? super EX, EX2> mapper) {
-        Objects.requireNonNull(mapper);
-        
-		return t -> {
-			try {
-				return this.applyAsInt(t);
-			} catch(RuntimeException ex) {
-				throw ex;
-			} catch (Exception e) {
-				@SuppressWarnings("unchecked")
-				EX ex = (EX) e;
-				throw mapper.apply(ex);
-			}
-		};
-	}
-	
-	/**
-	 * Passes any checked exceptions to the supplied exception handler. Afterwards,
-	 * the exception is rethrown.
-	 */
-	default CheckedToIntFunction<T, EX> except(Consumer<? super EX> exceptionHandler) {	
-        Objects.requireNonNull(exceptionHandler);
-        
-		return t -> {
-			try {
-				return this.applyAsInt(t);
-			} catch(RuntimeException ex) {
-				throw ex;
-			} catch (Exception e) {
-				@SuppressWarnings("unchecked")
-				EX ex = (EX) e;
-				exceptionHandler.accept(ex);
-				throw ex;
-			}
-		};
-	}
-	
-	/**
-	 * Passes any checked exceptions that match the specified type to the supplied
-	 * exception handler. Afterwards, the exception is rethrown.
-	 */
-	default <EX2 extends EX> CheckedToIntFunction<T, EX> except(
-			Class<EX2> cls, Consumer<? super EX2> exceptionHandler) {
-        Objects.requireNonNull(cls);
-        Objects.requireNonNull(exceptionHandler);
-        
-		return t -> {
-			try {
-				return this.applyAsInt(t);
-			} catch(RuntimeException ex) {
-				throw ex;
-			} catch (Exception e) {
-				if(cls.isInstance(e)) {
-					exceptionHandler.accept(cls.cast(e));					
+		/**
+		 * In case an exception occurs, an empty Optional is returned
+		 */
+		default Function<T, OptionalInt> optional() {
+			return t -> {
+				try {
+					return OptionalInt.of(applyOrThrow(t));
+				} catch (Exception e) {
+					return OptionalInt.empty();
 				}
-				@SuppressWarnings("unchecked")
-				EX ex = (EX) e;
-				throw ex;
-			}
-		};
-	}
-	
-	/**
-	 * Passes any unchecked exceptions to the supplied exception handler.
-	 * Afterwards, the exception is rethrown.
-	 */
-	default CheckedToIntFunction<T, EX> exceptUnchecked(
-			Consumer<? super RuntimeException> exceptionHandler) {
-		return exceptUnchecked(RuntimeException.class, exceptionHandler);
-	}
-	
-	default <REX extends RuntimeException> CheckedToIntFunction<T, EX> exceptUnchecked(
-			Class<REX> cls, Consumer<? super REX> exceptionHandler) {
-        Objects.requireNonNull(cls);
-        Objects.requireNonNull(exceptionHandler);        
-        
-		return t -> {
-			try {
-				return this.applyAsInt(t);
-			} catch(RuntimeException e) {
-				if(cls.isInstance(e)) {
-					exceptionHandler.accept(cls.cast(e));					
+			};
+		}
+		
+		/**
+		 * In case an exception occurs, the supplied function will be used as the
+		 * result. Otherwise the supplied function is never evaluated.
+		 */
+		default CheckedToIntFunction.Adapter<T, EX> fallbackTo(ToIntFunction<? super T> other) {
+	        Objects.requireNonNull(other);
+	        
+			return t -> {
+				try {
+					return applyOrThrow(t);
+				} catch (Exception e) {
+					return other.applyAsInt(t);
 				}
-				throw e;
-			} catch (Exception e) {
-				@SuppressWarnings("unchecked")
-				EX ex = (EX) e;
-				throw ex;
-			}
-		};
-	}
-	
-	/**
-	 * Passes any unchecked exceptions that match the specified type to the supplied
-	 * exception handler. Afterwards, the exception is rethrown.
-	 */
-	default CheckedToIntFunction<T, EX> orTry(CheckedToIntFunction<? super T, ? extends EX> other) {
-        Objects.requireNonNull(other);
-        
-		return t -> {
-			try {
-				return applyAsInt(t);
-			} catch (Exception e) {
-				return other.applyAsInt(t);
-			}
-		};
+			};
+		}
+		
+		/**
+		 * In case an exception occurs, the supplied value will be used as the
+		 * result.
+		 */
+		default CheckedToIntFunction.Adapter<T, EX> orReturn(int value) {
+			return t -> {
+				try {
+					return applyOrThrow(t);
+				} catch (Exception e) {
+					return value;
+				}
+			};
+		}
+		
+		/**
+		 * Rethrow any checked exceptions as unchecked exceptions by passing through the supplied mapper. 
+		 */
+		default CheckedToIntFunction.Adapter<T, EX> rethrowUnchecked(Function<? super EX, ? extends RuntimeException> mapper) {
+	        Objects.requireNonNull(mapper);
+	        
+			return t -> {
+				try {
+					return this.applyOrThrow(t);
+				} catch(RuntimeException ex) {
+					throw ex;
+				} catch (Exception e) {
+					@SuppressWarnings("unchecked")
+					EX ex = (EX) e;
+					throw mapper.apply(ex);
+				}
+			};
+		}
+		
+		// Convert in some way, but still not fully handled
+		/**
+		 * Rethrow any checked exceptions by passing through the supplied mapper. 
+		 */
+		default <EX2 extends Exception> CheckedToIntFunction.Helper<T, EX2> rethrow(Function<? super EX, EX2> mapper) {
+	        Objects.requireNonNull(mapper);
+	        
+			return t -> {
+				try {
+					return this.applyOrThrow(t);
+				} catch(RuntimeException ex) {
+					throw ex;
+				} catch (Exception e) {
+					@SuppressWarnings("unchecked")
+					EX ex = (EX) e;
+					throw mapper.apply(ex);
+				}
+			};
+		}
+		
+		/**
+		 * Passes any checked exceptions to the supplied exception handler. Afterwards,
+		 * the exception is rethrown.
+		 */
+		default CheckedToIntFunction.Helper<T, EX> except(Consumer<? super EX> exceptionHandler) {	
+	        Objects.requireNonNull(exceptionHandler);
+	        
+			return t -> {
+				try {
+					return this.applyOrThrow(t);
+				} catch(RuntimeException ex) {
+					throw ex;
+				} catch (Exception e) {
+					@SuppressWarnings("unchecked")
+					EX ex = (EX) e;
+					exceptionHandler.accept(ex);
+					throw ex;
+				}
+			};
+		}
+		
+		/**
+		 * Passes any checked exceptions that match the specified type to the supplied
+		 * exception handler. Afterwards, the exception is rethrown.
+		 */
+		default <EX2 extends EX> CheckedToIntFunction.Helper<T, EX> except(
+				Class<EX2> cls, Consumer<? super EX2> exceptionHandler) {
+	        Objects.requireNonNull(cls);
+	        Objects.requireNonNull(exceptionHandler);
+	        
+			return t -> {
+				try {
+					return this.applyOrThrow(t);
+				} catch(RuntimeException ex) {
+					throw ex;
+				} catch (Exception e) {
+					if(cls.isInstance(e)) {
+						exceptionHandler.accept(cls.cast(e));					
+					}
+					@SuppressWarnings("unchecked")
+					EX ex = (EX) e;
+					throw ex;
+				}
+			};
+		}
+		
+		/**
+		 * Passes any unchecked exceptions to the supplied exception handler.
+		 * Afterwards, the exception is rethrown.
+		 */
+		default CheckedToIntFunction.Helper<T, EX> exceptUnchecked(
+				Consumer<? super RuntimeException> exceptionHandler) {
+			return exceptUnchecked(RuntimeException.class, exceptionHandler);
+		}
+		
+		default <REX extends RuntimeException> CheckedToIntFunction.Helper<T, EX> exceptUnchecked(
+				Class<REX> cls, Consumer<? super REX> exceptionHandler) {
+	        Objects.requireNonNull(cls);
+	        Objects.requireNonNull(exceptionHandler);        
+	        
+			return t -> {
+				try {
+					return this.applyOrThrow(t);
+				} catch(RuntimeException e) {
+					if(cls.isInstance(e)) {
+						exceptionHandler.accept(cls.cast(e));					
+					}
+					throw e;
+				} catch (Exception e) {
+					@SuppressWarnings("unchecked")
+					EX ex = (EX) e;
+					throw ex;
+				}
+			};
+		}
+		
+		/**
+		 * Passes any unchecked exceptions that match the specified type to the supplied
+		 * exception handler. Afterwards, the exception is rethrown.
+		 */
+		default CheckedToIntFunction.Helper<T, EX> orTry(CheckedToIntFunction<? super T, ? extends EX> other) {
+	        Objects.requireNonNull(other);
+	        
+			return t -> {
+				try {
+					return applyOrThrow(t);
+				} catch (Exception e) {
+					return other.applyOrThrow(t);
+				}
+			};
+		}
 	}
 }

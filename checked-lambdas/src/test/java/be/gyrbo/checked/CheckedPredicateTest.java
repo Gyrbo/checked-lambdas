@@ -37,7 +37,7 @@ public class CheckedPredicateTest {
 		try {
 			Checked.predicate(CheckedPredicateTest::throwParseException)
 				.rethrow(DummyException::new)
-				.test(INPUT);
+				.testOrThrow(INPUT);
 			
 			fail("DummyException should have been thrown");
 		} catch (DummyException e) {
@@ -63,7 +63,7 @@ public class CheckedPredicateTest {
 		CheckedPredicate<String, ParseException> predicate =
 				Checked.predicate(CheckedPredicateTest::throwParseException)
 			.orTry(CheckedPredicateTest::isEmpty);
-		assertDoesNotThrow(() -> predicate.test(INPUT)); 
+		assertDoesNotThrow(() -> predicate.testOrThrow(INPUT)); 
 	}
 	
 	@Test

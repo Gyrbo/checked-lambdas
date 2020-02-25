@@ -18,11 +18,12 @@ public interface Checked {
 		return CheckedStream.of(stream, exception);
 	}
 	
-	public static <T, EX extends Exception> CheckedPredicate<T, EX> predicate(CheckedPredicate<T, EX> predicate) {
+	public static <T, EX extends Exception> CheckedPredicate.Helper<T, EX> predicate(
+			CheckedPredicate.Helper<T, EX> predicate) {
 		return predicate;
 	}
 	
-	public static <T, EX extends Exception> CheckedPredicate<T, EX> predicateOf(Predicate<T> predicate) {
+	public static <T, EX extends Exception> CheckedPredicate.Helper<T, EX> predicateOf(Predicate<T> predicate) {
 		return predicate::test;
 	}
 }
