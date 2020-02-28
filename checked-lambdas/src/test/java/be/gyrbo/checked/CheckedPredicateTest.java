@@ -13,6 +13,7 @@ import java.text.ParseException;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
+import java.util.function.IntPredicate;
 import java.util.function.Predicate;
 
 import org.junit.jupiter.api.Test;
@@ -24,6 +25,14 @@ public class CheckedPredicateTest {
 	private static final String INPUT = "INPUT";
 	
 
+	@Test
+	void testIntPredicate() {
+		IntPredicate predicate =
+				Checked.intPredicate(i -> (i % 2) == 0)
+			.orReturn(true);
+		assertTrue(predicate.test(2));
+	}
+	
 	@Test
 	void testFallback() {
 		Predicate<String> predicate =

@@ -4,6 +4,7 @@
 
 package be.gyrbo.checked;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.text.ParseException;
@@ -19,9 +20,11 @@ public class CheckStreamTest {
 	void testFilterPredicate() throws ParseException {
 		Predicate<String> isStrEmpty = String::isEmpty;
 		
-		Checked.stream(Stream.of("a", "b"), ParseException.class)
+		String result = Checked.stream(Stream.of("a", "b"), ParseException.class)
 			.filter(Checked.predicateOf(isStrEmpty.negate()))
 			.collect(Collectors.joining(", "));
+		
+		assertEquals("a, b", result);
 	}
 
 	@Test
@@ -37,4 +40,12 @@ public class CheckStreamTest {
 		}
 	}
 
+	@Test
+	void testFilterHandledCheckedPredicate() throws ParseException {
+		String result = Checked.stream(Stream.of("a", "b"), ParseException.class)
+			.filter(Checked.predicate(CheckedPredicateTest::throwParseException).orReturn(true))
+			.collect(Collectors.joining(", "));
+		
+		assertEquals("a, b", result);
+	}
 }
