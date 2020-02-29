@@ -4,15 +4,19 @@
 
 package be.gyrbo.checked;
 
+import java.util.function.Consumer;
+import java.util.function.DoubleConsumer;
 import java.util.function.DoubleFunction;
 import java.util.function.DoublePredicate;
 import java.util.function.DoubleToIntFunction;
 import java.util.function.DoubleToLongFunction;
 import java.util.function.Function;
+import java.util.function.IntConsumer;
 import java.util.function.IntFunction;
 import java.util.function.IntPredicate;
 import java.util.function.IntToDoubleFunction;
 import java.util.function.IntToLongFunction;
+import java.util.function.LongConsumer;
 import java.util.function.LongFunction;
 import java.util.function.LongPredicate;
 import java.util.function.LongToDoubleFunction;
@@ -26,15 +30,19 @@ import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
+import be.gyrbo.checked.function.CheckedConsumer;
+import be.gyrbo.checked.function.CheckedDoubleConsumer;
 import be.gyrbo.checked.function.CheckedDoubleFunction;
 import be.gyrbo.checked.function.CheckedDoublePredicate;
 import be.gyrbo.checked.function.CheckedDoubleToIntFunction;
 import be.gyrbo.checked.function.CheckedDoubleToLongFunction;
 import be.gyrbo.checked.function.CheckedFunction;
+import be.gyrbo.checked.function.CheckedIntConsumer;
 import be.gyrbo.checked.function.CheckedIntFunction;
 import be.gyrbo.checked.function.CheckedIntPredicate;
 import be.gyrbo.checked.function.CheckedIntToDoubleFunction;
 import be.gyrbo.checked.function.CheckedIntToLongFunction;
+import be.gyrbo.checked.function.CheckedLongConsumer;
 import be.gyrbo.checked.function.CheckedLongFunction;
 import be.gyrbo.checked.function.CheckedLongPredicate;
 import be.gyrbo.checked.function.CheckedLongToDoubleFunction;
@@ -73,6 +81,16 @@ public class Checked {
 	public static <T, EX extends Exception> CheckedPredicate.Helper<T, EX> predicateOf(
 			Predicate<T> predicate) {
 		return predicate::test;
+	}
+	
+	public static <T, EX extends Exception> CheckedConsumer.Helper<T, EX> consumer(
+			CheckedConsumer.Helper<T, EX> predicate) {
+		return predicate;
+	}
+	
+	public static <T, EX extends Exception> CheckedConsumer.Helper<T, EX> consumerOf(
+			Consumer<T> predicate) {
+		return predicate::accept;
 	}
 	
 	public static <T, R, EX extends Exception> CheckedFunction.Helper<T, R, EX> function(
@@ -125,6 +143,16 @@ public class Checked {
 		return predicate::test;
 	}
 	
+	public static <EX extends Exception> CheckedIntConsumer.Helper<EX> intConsumer(
+			CheckedIntConsumer.Helper<EX> predicate) {
+		return predicate;
+	}
+	
+	public static <EX extends Exception> CheckedIntConsumer.Helper<EX> intConsumerOf(
+			IntConsumer predicate) {
+		return predicate::accept;
+	}
+	
 	public static <R, EX extends Exception> CheckedIntFunction.Helper<R, EX> functionInt(
 			CheckedIntFunction.Helper<R, EX> function) {
 		return function;
@@ -165,6 +193,16 @@ public class Checked {
 		return predicate::test;
 	}
 	
+	public static <EX extends Exception> CheckedLongConsumer.Helper<EX> longConsumer(
+			CheckedLongConsumer.Helper<EX> predicate) {
+		return predicate;
+	}
+	
+	public static <EX extends Exception> CheckedLongConsumer.Helper<EX> longConsumerOf(
+			LongConsumer predicate) {
+		return predicate::accept;
+	}
+	
 	public static <R, EX extends Exception> CheckedLongFunction.Helper<R, EX> functionLong(
 			CheckedLongFunction.Helper<R, EX> function) {
 		return function;
@@ -203,6 +241,16 @@ public class Checked {
 	public static <EX extends Exception> CheckedDoublePredicate.Helper<EX> doublePredicateOf(
 			DoublePredicate predicate) {
 		return predicate::test;
+	}
+	
+	public static <EX extends Exception> CheckedDoubleConsumer.Helper<EX> doubleConsumer(
+			CheckedDoubleConsumer.Helper<EX> predicate) {
+		return predicate;
+	}
+	
+	public static <EX extends Exception> CheckedDoubleConsumer.Helper<EX> doubleConsumerOf(
+			DoubleConsumer predicate) {
+		return predicate::accept;
 	}
 	
 	public static <R, EX extends Exception> CheckedDoubleFunction.Helper<R, EX> functionDouble(

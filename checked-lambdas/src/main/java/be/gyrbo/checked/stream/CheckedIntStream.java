@@ -52,8 +52,8 @@ public class CheckedIntStream<EX extends Exception> extends CheckedBaseStream<In
 		return delegate.collect(p0, p1, p2);
 	}
 
-	public void forEach(IntConsumer p0) throws EX {
-		delegate.forEach(p0);
+	public void forEach(CheckedIntConsumer<EX> p0) throws EX {
+		delegate.forEach(p0.sneakyThrow());
 	}
 
 	public int sum() throws EX {
@@ -69,12 +69,12 @@ public class CheckedIntStream<EX extends Exception> extends CheckedBaseStream<In
 		return delegate.reduce(p0, p1);
 	}
 
-	public boolean allMatch(IntPredicate p0) throws EX {
-		return delegate.allMatch(p0);
+	public boolean allMatch(CheckedIntPredicate<EX> p0) throws EX {
+		return delegate.allMatch(p0.sneakyThrow());
 	}
 
-	public boolean anyMatch(IntPredicate p0) throws EX {
-		return delegate.anyMatch(p0);
+	public boolean anyMatch(CheckedIntPredicate<EX> p0) throws EX {
+		return delegate.anyMatch(p0.sneakyThrow());
 	}
 
 	public OptionalInt findAny() throws EX {
@@ -85,12 +85,12 @@ public class CheckedIntStream<EX extends Exception> extends CheckedBaseStream<In
 		return delegate.findFirst();
 	}
 
-	public void forEachOrdered(IntConsumer p0) throws EX {
-		delegate.forEachOrdered(p0);
+	public void forEachOrdered(CheckedIntConsumer<EX> p0) throws EX {
+		delegate.forEachOrdered(p0.sneakyThrow());
 	}
 
-	public boolean noneMatch(IntPredicate p0) throws EX {
-		return delegate.noneMatch(p0);
+	public boolean noneMatch(CheckedIntPredicate<EX> p0) throws EX {
+		return delegate.noneMatch(p0.sneakyThrow());
 	}
 
 	public OptionalDouble average() throws EX {
@@ -111,8 +111,8 @@ public class CheckedIntStream<EX extends Exception> extends CheckedBaseStream<In
 		return fromStream(delegate.skip(p0));
 	}
 
-	public CheckedIntStream<EX> peek(IntConsumer p0) {
-		return fromStream(delegate.peek(p0));
+	public CheckedIntStream<EX> peek(CheckedIntConsumer<EX> p0) {
+		return fromStream(delegate.peek(p0.sneakyThrow()));
 	}
 
 	public CheckedIntStream<EX> filter(CheckedIntPredicate<EX> p0) {

@@ -52,8 +52,8 @@ public class CheckedDoubleStream<EX extends Exception> extends CheckedBaseStream
 		return delegate.collect(p0, p1, p2);
 	}
 
-	public void forEach(DoubleConsumer p0) throws EX {
-		delegate.forEach(p0);
+	public void forEach(CheckedDoubleConsumer<EX> p0) throws EX {
+		delegate.forEach(p0.sneakyThrow());
 	}
 
 	public double sum() throws EX {
@@ -69,12 +69,12 @@ public class CheckedDoubleStream<EX extends Exception> extends CheckedBaseStream
 		return delegate.reduce(p0, p1);
 	}
 
-	public boolean allMatch(DoublePredicate p0) throws EX {
-		return delegate.allMatch(p0);
+	public boolean allMatch(CheckedDoublePredicate<EX> p0) throws EX {
+		return delegate.allMatch(p0.sneakyThrow());
 	}
 
-	public boolean anyMatch(DoublePredicate p0) throws EX {
-		return delegate.anyMatch(p0);
+	public boolean anyMatch(CheckedDoublePredicate<EX> p0) throws EX {
+		return delegate.anyMatch(p0.sneakyThrow());
 	}
 
 	public OptionalDouble findAny() throws EX {
@@ -85,12 +85,12 @@ public class CheckedDoubleStream<EX extends Exception> extends CheckedBaseStream
 		return delegate.findFirst();
 	}
 
-	public void forEachOrdered(DoubleConsumer p0) throws EX {
-		delegate.forEachOrdered(p0);
+	public void forEachOrdered(CheckedDoubleConsumer<EX> p0) throws EX {
+		delegate.forEachOrdered(p0.sneakyThrow());
 	}
 
-	public boolean noneMatch(DoublePredicate p0) throws EX {
-		return delegate.noneMatch(p0);
+	public boolean noneMatch(CheckedDoublePredicate<EX> p0) throws EX {
+		return delegate.noneMatch(p0.sneakyThrow());
 	}
 
 	public OptionalDouble average() throws EX {
@@ -111,8 +111,8 @@ public class CheckedDoubleStream<EX extends Exception> extends CheckedBaseStream
 		return fromStream(delegate.skip(p0));
 	}
 
-	public CheckedDoubleStream<EX> peek(DoubleConsumer p0) {
-		return fromStream(delegate.peek(p0));
+	public CheckedDoubleStream<EX> peek(CheckedDoubleConsumer<EX> p0) {
+		return fromStream(delegate.peek(p0.sneakyThrow()));
 	}
 
 	public CheckedDoubleStream<EX> filter(CheckedDoublePredicate<EX> p0) {

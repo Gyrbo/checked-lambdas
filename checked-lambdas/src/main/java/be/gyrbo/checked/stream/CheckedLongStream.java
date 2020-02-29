@@ -52,8 +52,8 @@ public class CheckedLongStream<EX extends Exception> extends CheckedBaseStream<L
 		return delegate.collect(p0, p1, p2);
 	}
 
-	public void forEach(LongConsumer p0) throws EX {
-		delegate.forEach(p0);
+	public void forEach(CheckedLongConsumer<EX> p0) throws EX {
+		delegate.forEach(p0.sneakyThrow());
 	}
 
 	public long sum() throws EX {
@@ -69,12 +69,12 @@ public class CheckedLongStream<EX extends Exception> extends CheckedBaseStream<L
 		return delegate.reduce(p0, p1);
 	}
 
-	public boolean allMatch(LongPredicate p0) throws EX {
-		return delegate.allMatch(p0);
+	public boolean allMatch(CheckedLongPredicate<EX> p0) throws EX {
+		return delegate.allMatch(p0.sneakyThrow());
 	}
 
-	public boolean anyMatch(LongPredicate p0) throws EX {
-		return delegate.anyMatch(p0);
+	public boolean anyMatch(CheckedLongPredicate<EX> p0) throws EX {
+		return delegate.anyMatch(p0.sneakyThrow());
 	}
 
 	public OptionalLong findAny() throws EX {
@@ -85,12 +85,12 @@ public class CheckedLongStream<EX extends Exception> extends CheckedBaseStream<L
 		return delegate.findFirst();
 	}
 
-	public void forEachOrdered(LongConsumer p0) throws EX {
-		delegate.forEachOrdered(p0);
+	public void forEachOrdered(CheckedLongConsumer<EX> p0) throws EX {
+		delegate.forEachOrdered(p0.sneakyThrow());
 	}
 
-	public boolean noneMatch(LongPredicate p0) throws EX {
-		return delegate.noneMatch(p0);
+	public boolean noneMatch(CheckedLongPredicate<EX> p0) throws EX {
+		return delegate.noneMatch(p0.sneakyThrow());
 	}
 
 	public OptionalDouble average() throws EX {
@@ -111,8 +111,8 @@ public class CheckedLongStream<EX extends Exception> extends CheckedBaseStream<L
 		return fromStream(delegate.skip(p0));
 	}
 
-	public CheckedLongStream<EX> peek(LongConsumer p0) {
-		return fromStream(delegate.peek(p0));
+	public CheckedLongStream<EX> peek(CheckedLongConsumer<EX> p0) {
+		return fromStream(delegate.peek(p0.sneakyThrow()));
 	}
 
 	public CheckedLongStream<EX> filter(CheckedLongPredicate<EX> p0) {

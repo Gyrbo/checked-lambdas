@@ -34,8 +34,8 @@ public class CheckedStream<T, EX extends Exception> extends CheckedBaseStream<St
 		return delegate.max(p0);
 	}
 
-	public <A> A[] toArray(IntFunction<A[]> p0) throws EX {
-		return delegate.toArray(p0);
+	public <A> A[] toArray(CheckedIntFunction<A[], EX> p0) throws EX {
+		return delegate.toArray(p0.sneakyThrow());
 	}
 
 	public Object[] toArray() throws EX {
@@ -52,8 +52,8 @@ public class CheckedStream<T, EX extends Exception> extends CheckedBaseStream<St
 		return delegate.collect(p0);
 	}
 
-	public void forEach(Consumer<? super T> p0) throws EX {
-		delegate.forEach(p0);
+	public void forEach(CheckedConsumer<? super T, EX> p0) throws EX {
+		delegate.forEach(p0.sneakyThrow());
 	}
 
 	public Optional<T> reduce(BinaryOperator<T> p0) throws EX {
@@ -71,12 +71,12 @@ public class CheckedStream<T, EX extends Exception> extends CheckedBaseStream<St
 		return delegate.reduce(p0, p1);
 	}
 
-	public boolean allMatch(Predicate<? super T> p0) throws EX {
-		return delegate.allMatch(p0);
+	public boolean allMatch(CheckedPredicate<? super T, EX> p0) throws EX {
+		return delegate.allMatch(p0.sneakyThrow());
 	}
 
-	public boolean anyMatch(Predicate<? super T> p0) throws EX {
-		return delegate.anyMatch(p0);
+	public boolean anyMatch(CheckedPredicate<? super T, EX> p0) throws EX {
+		return delegate.anyMatch(p0.sneakyThrow());
 	}
 
 	public Optional<T> findAny() throws EX {
@@ -87,12 +87,12 @@ public class CheckedStream<T, EX extends Exception> extends CheckedBaseStream<St
 		return delegate.findFirst();
 	}
 
-	public void forEachOrdered(Consumer<? super T> p0) throws EX {
-		delegate.forEachOrdered(p0);
+	public void forEachOrdered(CheckedConsumer<? super T, EX> p0) throws EX {
+		delegate.forEachOrdered(p0.sneakyThrow());
 	}
 
-	public boolean noneMatch(Predicate<? super T> p0) throws EX {
-		return delegate.noneMatch(p0);
+	public boolean noneMatch(CheckedPredicate<? super T, EX> p0) throws EX {
+		return delegate.noneMatch(p0.sneakyThrow());
 	}
 
 	// Intermediate operations
@@ -105,8 +105,8 @@ public class CheckedStream<T, EX extends Exception> extends CheckedBaseStream<St
 		return fromStream(delegate.skip(p0));
 	}
 
-	public CheckedStream<T, EX> peek(Consumer<? super T> p0) {
-		return fromStream(delegate.peek(p0));
+	public CheckedStream<T, EX> peek(CheckedConsumer<? super T, EX> p0) {
+		return fromStream(delegate.peek(p0.sneakyThrow()));
 	}
 
 	public CheckedStream<T, EX> filter(CheckedPredicate<? super T, EX> p0) {
