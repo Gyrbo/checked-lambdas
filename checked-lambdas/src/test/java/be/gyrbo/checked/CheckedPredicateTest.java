@@ -26,7 +26,7 @@ public class CheckedPredicateTest {
 	
 
 	@Test
-	void testIntPredicate() {
+	public void testIntPredicate() {
 		IntPredicate predicate =
 				Checked.intPredicate(i -> (i % 2) == 0)
 			.orReturn(true);
@@ -34,7 +34,7 @@ public class CheckedPredicateTest {
 	}
 	
 	@Test
-	void testFallback() {
+	public void testFallback() {
 		Predicate<String> predicate =
 				Checked.predicate(CheckedPredicateTest::throwParseException)
 			.orReturn(true);
@@ -42,7 +42,7 @@ public class CheckedPredicateTest {
 	}
 	
 	@Test
-	void testRethrowUnchecked1() {
+	public void testRethrowUnchecked1() {
 		try {
 			Checked.predicate(CheckedPredicateTest::throwParseException)
 				.rethrow(DummyException::new)
@@ -55,7 +55,7 @@ public class CheckedPredicateTest {
 	}
 	
 	@Test
-	void testRethrowUnchecked2() {
+	public void testRethrowUnchecked2() {
 		try {
 			Predicate<String> predicate = Checked.predicate(CheckedPredicateTest::throwParseException)
 				.rethrowUnchecked(DummyException::new);
@@ -68,7 +68,7 @@ public class CheckedPredicateTest {
 	}
 	
 	@Test
-	void testOrTry() {
+	public void testOrTry() {
 		CheckedPredicate<String, ParseException> predicate =
 				Checked.predicate(CheckedPredicateTest::throwParseException)
 			.orTry(CheckedPredicateTest::isEmpty);
@@ -76,7 +76,7 @@ public class CheckedPredicateTest {
 	}
 	
 	@Test
-	void testExceptUnchecked() {
+	public void testExceptUnchecked() {
 		AtomicBoolean dummyExceptionSeen = new AtomicBoolean();
 		Checked.predicate(CheckedPredicateTest::throwParseException)
 			.rethrow(DummyException::new)
@@ -88,7 +88,7 @@ public class CheckedPredicateTest {
 	}
 	
 	@Test
-	void testOptional() {
+	public void testOptional() {
 		Function<String, Optional<Boolean>> optionalPredicate = Checked.predicate(CheckedPredicateTest::throwParseException)
 			.optional();
 		Optional<Boolean> optional = optionalPredicate.apply(INPUT);

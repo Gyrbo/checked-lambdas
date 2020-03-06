@@ -18,15 +18,15 @@ public class CheckedBaseStream<S, EX extends Exception> {
 		return new CheckedStream<U, EX>(delegate, exception);
 	}
 	
-	protected <U> CheckedIntStream<EX> fromStream(IntStream delegate) {
+	protected CheckedIntStream<EX> fromStream(IntStream delegate) {
 		return new CheckedIntStream<EX>(delegate, exception);
 	}
 	
-	protected <U> CheckedLongStream<EX> fromStream(LongStream delegate) {
+	protected CheckedLongStream<EX> fromStream(LongStream delegate) {
 		return new CheckedLongStream<EX>(delegate, exception);
 	}
 	
-	protected <U> CheckedDoubleStream<EX> fromStream(DoubleStream delegate) {
+	protected CheckedDoubleStream<EX> fromStream(DoubleStream delegate) {
 		return new CheckedDoubleStream<EX>(delegate, exception);
 	}
 }
