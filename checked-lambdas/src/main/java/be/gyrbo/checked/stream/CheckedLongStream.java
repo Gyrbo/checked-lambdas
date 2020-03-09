@@ -9,18 +9,18 @@ import java.util.OptionalDouble;
 import java.util.OptionalLong;
 import java.util.PrimitiveIterator;
 import java.util.Spliterator;
-import java.util.function.BiConsumer;
 import java.util.function.LongUnaryOperator;
-import java.util.function.ObjLongConsumer;
-import java.util.function.Supplier;
 import java.util.stream.LongStream;
 
+import be.gyrbo.checked.function.CheckedBiConsumer;
 import be.gyrbo.checked.function.CheckedLongBinaryOperator;
 import be.gyrbo.checked.function.CheckedLongConsumer;
 import be.gyrbo.checked.function.CheckedLongFunction;
 import be.gyrbo.checked.function.CheckedLongPredicate;
 import be.gyrbo.checked.function.CheckedLongToDoubleFunction;
 import be.gyrbo.checked.function.CheckedLongToIntFunction;
+import be.gyrbo.checked.function.CheckedObjLongConsumer;
+import be.gyrbo.checked.function.CheckedSupplier;
 
 public class CheckedLongStream<EX extends Exception> extends CheckedBaseStream<LongStream, EX> {
 	
@@ -55,10 +55,10 @@ public class CheckedLongStream<EX extends Exception> extends CheckedBaseStream<L
 		return delegate.reduce(p0.sneakyThrow());
 	}
 
-	public <R> R collect(Supplier<R> p0,
-			ObjLongConsumer<R> p1,
-			BiConsumer<R, R> p2) throws EX {
-		return delegate.collect(p0, p1, p2);
+	public <R> R collect(CheckedSupplier<R, EX> p0,
+			CheckedObjLongConsumer<R, EX> p1,
+			CheckedBiConsumer<R, R, EX> p2) throws EX {
+		return delegate.collect(p0.sneakyThrow(), p1.sneakyThrow(), p2.sneakyThrow());
 	}
 
 	public long sum() throws EX {

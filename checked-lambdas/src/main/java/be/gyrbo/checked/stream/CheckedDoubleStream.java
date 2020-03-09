@@ -8,18 +8,18 @@ import java.util.DoubleSummaryStatistics;
 import java.util.OptionalDouble;
 import java.util.PrimitiveIterator;
 import java.util.Spliterator;
-import java.util.function.BiConsumer;
 import java.util.function.DoubleUnaryOperator;
-import java.util.function.ObjDoubleConsumer;
-import java.util.function.Supplier;
 import java.util.stream.DoubleStream;
 
+import be.gyrbo.checked.function.CheckedBiConsumer;
 import be.gyrbo.checked.function.CheckedDoubleBinaryOperator;
 import be.gyrbo.checked.function.CheckedDoubleConsumer;
 import be.gyrbo.checked.function.CheckedDoubleFunction;
 import be.gyrbo.checked.function.CheckedDoublePredicate;
 import be.gyrbo.checked.function.CheckedDoubleToIntFunction;
 import be.gyrbo.checked.function.CheckedDoubleToLongFunction;
+import be.gyrbo.checked.function.CheckedObjDoubleConsumer;
+import be.gyrbo.checked.function.CheckedSupplier;
 
 public class CheckedDoubleStream<EX extends Exception> extends CheckedBaseStream<DoubleStream, EX> {
 	
@@ -54,10 +54,10 @@ public class CheckedDoubleStream<EX extends Exception> extends CheckedBaseStream
 		return delegate.reduce(p0.sneakyThrow());
 	}
 
-	public <R> R collect(Supplier<R> p0,
-			ObjDoubleConsumer<R> p1,
-			BiConsumer<R, R> p2) throws EX {
-		return delegate.collect(p0, p1, p2);
+	public <R> R collect(CheckedSupplier<R, EX> p0,
+			CheckedObjDoubleConsumer<R, EX> p1,
+			CheckedBiConsumer<R, R, EX> p2) throws EX {
+		return delegate.collect(p0.sneakyThrow(), p1.sneakyThrow(), p2.sneakyThrow());
 	}
 
 	public double sum() throws EX {

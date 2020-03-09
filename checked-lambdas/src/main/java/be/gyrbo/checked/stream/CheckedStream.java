@@ -6,20 +6,20 @@ package be.gyrbo.checked.stream;
 
 import java.util.Comparator;
 import java.util.Optional;
-import java.util.function.BiConsumer;
-import java.util.function.Supplier;
 import java.util.stream.Collector;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
+import be.gyrbo.checked.function.CheckedBiConsumer;
 import be.gyrbo.checked.function.CheckedBiFunction;
 import be.gyrbo.checked.function.CheckedBinaryOperator;
 import be.gyrbo.checked.function.CheckedConsumer;
 import be.gyrbo.checked.function.CheckedFunction;
 import be.gyrbo.checked.function.CheckedIntFunction;
 import be.gyrbo.checked.function.CheckedPredicate;
+import be.gyrbo.checked.function.CheckedSupplier;
 import be.gyrbo.checked.function.CheckedToDoubleFunction;
 import be.gyrbo.checked.function.CheckedToIntFunction;
 import be.gyrbo.checked.function.CheckedToLongFunction;
@@ -67,10 +67,10 @@ public class CheckedStream<T, EX extends Exception> extends CheckedBaseStream<St
 		return delegate.reduce(p0, p1.sneakyThrow(), p2.sneakyThrow());
 	}
 
-	public <R> R collect(Supplier<R> p0,
-			BiConsumer<R, ? super T> p1,
-			BiConsumer<R, R> p2) throws EX {
-		return delegate.collect(p0, p1, p2);
+	public <R> R collect(CheckedSupplier<R, EX> p0,
+			CheckedBiConsumer<R, ? super T, EX> p1,
+			CheckedBiConsumer<R, R, EX> p2) throws EX {
+		return delegate.collect(p0.sneakyThrow(), p1.sneakyThrow(), p2.sneakyThrow());
 	}
 
 	public <R, A> R collect(Collector<? super T, A, R> p0) throws EX {

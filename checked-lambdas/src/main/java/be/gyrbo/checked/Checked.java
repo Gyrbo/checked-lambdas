@@ -4,13 +4,16 @@
 
 package be.gyrbo.checked;
 
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.DoubleBinaryOperator;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleFunction;
 import java.util.function.DoublePredicate;
+import java.util.function.DoubleSupplier;
 import java.util.function.DoubleToIntFunction;
 import java.util.function.DoubleToLongFunction;
 import java.util.function.Function;
@@ -18,15 +21,21 @@ import java.util.function.IntBinaryOperator;
 import java.util.function.IntConsumer;
 import java.util.function.IntFunction;
 import java.util.function.IntPredicate;
+import java.util.function.IntSupplier;
 import java.util.function.IntToDoubleFunction;
 import java.util.function.IntToLongFunction;
 import java.util.function.LongBinaryOperator;
 import java.util.function.LongConsumer;
 import java.util.function.LongFunction;
 import java.util.function.LongPredicate;
+import java.util.function.LongSupplier;
 import java.util.function.LongToDoubleFunction;
 import java.util.function.LongToIntFunction;
+import java.util.function.ObjDoubleConsumer;
+import java.util.function.ObjIntConsumer;
+import java.util.function.ObjLongConsumer;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.function.ToDoubleBiFunction;
 import java.util.function.ToDoubleFunction;
 import java.util.function.ToIntBiFunction;
@@ -38,13 +47,16 @@ import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
+import be.gyrbo.checked.function.CheckedBiConsumer;
 import be.gyrbo.checked.function.CheckedBiFunction;
 import be.gyrbo.checked.function.CheckedBinaryOperator;
+import be.gyrbo.checked.function.CheckedBooleanSupplier;
 import be.gyrbo.checked.function.CheckedConsumer;
 import be.gyrbo.checked.function.CheckedDoubleBinaryOperator;
 import be.gyrbo.checked.function.CheckedDoubleConsumer;
 import be.gyrbo.checked.function.CheckedDoubleFunction;
 import be.gyrbo.checked.function.CheckedDoublePredicate;
+import be.gyrbo.checked.function.CheckedDoubleSupplier;
 import be.gyrbo.checked.function.CheckedDoubleToIntFunction;
 import be.gyrbo.checked.function.CheckedDoubleToLongFunction;
 import be.gyrbo.checked.function.CheckedFunction;
@@ -52,15 +64,21 @@ import be.gyrbo.checked.function.CheckedIntBinaryOperator;
 import be.gyrbo.checked.function.CheckedIntConsumer;
 import be.gyrbo.checked.function.CheckedIntFunction;
 import be.gyrbo.checked.function.CheckedIntPredicate;
+import be.gyrbo.checked.function.CheckedIntSupplier;
 import be.gyrbo.checked.function.CheckedIntToDoubleFunction;
 import be.gyrbo.checked.function.CheckedIntToLongFunction;
 import be.gyrbo.checked.function.CheckedLongBinaryOperator;
 import be.gyrbo.checked.function.CheckedLongConsumer;
 import be.gyrbo.checked.function.CheckedLongFunction;
 import be.gyrbo.checked.function.CheckedLongPredicate;
+import be.gyrbo.checked.function.CheckedLongSupplier;
 import be.gyrbo.checked.function.CheckedLongToDoubleFunction;
 import be.gyrbo.checked.function.CheckedLongToIntFunction;
+import be.gyrbo.checked.function.CheckedObjDoubleConsumer;
+import be.gyrbo.checked.function.CheckedObjIntConsumer;
+import be.gyrbo.checked.function.CheckedObjLongConsumer;
 import be.gyrbo.checked.function.CheckedPredicate;
+import be.gyrbo.checked.function.CheckedSupplier;
 import be.gyrbo.checked.function.CheckedToDoubleBiFunction;
 import be.gyrbo.checked.function.CheckedToDoubleFunction;
 import be.gyrbo.checked.function.CheckedToIntBiFunction;
@@ -89,6 +107,16 @@ public class Checked {
 		return CheckedDoubleStream.of(stream, exception);
 	}
 
+	public static <EX extends Exception> CheckedBooleanSupplier.Helper<EX> booleanSupplier(
+			CheckedBooleanSupplier.Helper<EX> supplier) {
+		return supplier;
+	}
+	
+	public static <EX extends Exception> CheckedBooleanSupplier.Adapter<EX> of(
+			BooleanSupplier supplier) {
+		return supplier::getAsBoolean;
+	}
+	
 	public static <T, EX extends Exception> CheckedPredicate.Helper<T, EX> predicate(
 			CheckedPredicate.Helper<T, EX> predicate) {
 		return predicate;
@@ -100,13 +128,13 @@ public class Checked {
 	}
 	
 	public static <T, EX extends Exception> CheckedConsumer.Helper<T, EX> consumer(
-			CheckedConsumer.Helper<T, EX> predicate) {
-		return predicate;
+			CheckedConsumer.Helper<T, EX> consumer) {
+		return consumer;
 	}
 	
 	public static <T, EX extends Exception> CheckedConsumer.Adapter<T, EX> of(
-			Consumer<T> predicate) {
-		return predicate::accept;
+			Consumer<T> consumer) {
+		return consumer::accept;
 	}
 	
 	public static <T, U, R, EX extends Exception> CheckedBiFunction.Helper<T, U, R, EX> biFunction(
@@ -120,13 +148,33 @@ public class Checked {
 	}
 	
 	public static <T, EX extends Exception> CheckedBinaryOperator.Helper<T, EX> binaryOperator(
-			CheckedBinaryOperator.Helper<T, EX> function) {
-		return function;
+			CheckedBinaryOperator.Helper<T, EX> operator) {
+		return operator;
 	}
 	
 	public static <T, EX extends Exception> CheckedBinaryOperator.Adapter<T, EX> of(
-			BinaryOperator<T> function) {
-		return function::apply;
+			BinaryOperator<T> operator) {
+		return operator::apply;
+	}
+	
+	public static <T, U, EX extends Exception> CheckedBiConsumer.Helper<T, U, EX> biConsumer(
+			CheckedBiConsumer.Helper<T, U, EX> consumer) {
+		return consumer;
+	}
+	
+	public static <T, U, EX extends Exception> CheckedBiConsumer.Adapter<T, U, EX> of(
+			BiConsumer<T, U> consumer) {
+		return consumer::accept;
+	}
+	
+	public static <T, EX extends Exception> CheckedSupplier.Helper<T, EX> supplier(
+			CheckedSupplier.Helper<T, EX> supplier) {
+		return supplier;
+	}
+	
+	public static <T, EX extends Exception> CheckedSupplier.Adapter<T, EX> of(
+			Supplier<T> supplier) {
+		return supplier::get;
 	}
 	
 	public static <T, R, EX extends Exception> CheckedFunction.Helper<T, R, EX> function(
@@ -180,13 +228,13 @@ public class Checked {
 	}
 	
 	public static <EX extends Exception> CheckedIntConsumer.Helper<EX> intConsumer(
-			CheckedIntConsumer.Helper<EX> predicate) {
-		return predicate;
+			CheckedIntConsumer.Helper<EX> consumer) {
+		return consumer;
 	}
 	
 	public static <EX extends Exception> CheckedIntConsumer.Adapter<EX> of(
-			IntConsumer predicate) {
-		return predicate::accept;
+			IntConsumer consumer) {
+		return consumer::accept;
 	}
 	
 	public static <T, U, EX extends Exception> CheckedToIntBiFunction.Helper<T, U, EX> toIntBiFunction(
@@ -200,13 +248,33 @@ public class Checked {
 	}
 	
 	public static <EX extends Exception> CheckedIntBinaryOperator.Helper<EX> intBinaryOperator(
-			CheckedIntBinaryOperator.Helper<EX> function) {
-		return function;
+			CheckedIntBinaryOperator.Helper<EX> operator) {
+		return operator;
 	}
 	
 	public static <EX extends Exception> CheckedIntBinaryOperator.Adapter<EX> of(
-			IntBinaryOperator function) {
-		return function::applyAsInt;
+			IntBinaryOperator operator) {
+		return operator::applyAsInt;
+	}
+	
+	public static <T, EX extends Exception> CheckedObjIntConsumer.Helper<T, EX> objIntConsumer(
+			CheckedObjIntConsumer.Helper<T, EX> consumer) {
+		return consumer;
+	}
+	
+	public static <T, EX extends Exception> CheckedObjIntConsumer.Adapter<T, EX> of(
+			ObjIntConsumer<T> consumer) {
+		return consumer::accept;
+	}
+	
+	public static <EX extends Exception> CheckedIntSupplier.Helper<EX> intSupplier(
+			CheckedIntSupplier.Helper<EX> supplier) {
+		return supplier;
+	}
+	
+	public static <EX extends Exception> CheckedIntSupplier.Adapter<EX> of(
+			IntSupplier supplier) {
+		return supplier::getAsInt;
 	}
 	
 	public static <R, EX extends Exception> CheckedIntFunction.Helper<R, EX> intFunction(
@@ -250,13 +318,13 @@ public class Checked {
 	}
 	
 	public static <EX extends Exception> CheckedLongConsumer.Helper<EX> longConsumer(
-			CheckedLongConsumer.Helper<EX> predicate) {
-		return predicate;
+			CheckedLongConsumer.Helper<EX> consumer) {
+		return consumer;
 	}
 	
 	public static <EX extends Exception> CheckedLongConsumer.Adapter<EX> of(
-			LongConsumer predicate) {
-		return predicate::accept;
+			LongConsumer consumer) {
+		return consumer::accept;
 	}
 	
 	public static <T, U, EX extends Exception> CheckedToLongBiFunction.Helper<T, U, EX> toLongBiFunction(
@@ -270,13 +338,33 @@ public class Checked {
 	}
 	
 	public static <EX extends Exception> CheckedLongBinaryOperator.Helper<EX> longBinaryOperator(
-			CheckedLongBinaryOperator.Helper<EX> function) {
-		return function;
+			CheckedLongBinaryOperator.Helper<EX> operator) {
+		return operator;
 	}
 	
 	public static <EX extends Exception> CheckedLongBinaryOperator.Adapter<EX> of(
-			LongBinaryOperator function) {
-		return function::applyAsLong;
+			LongBinaryOperator operator) {
+		return operator::applyAsLong;
+	}
+	
+	public static <T, EX extends Exception> CheckedObjLongConsumer.Helper<T, EX> objLongConsumer(
+			CheckedObjLongConsumer.Helper<T, EX> consumer) {
+		return consumer;
+	}
+	
+	public static <T, EX extends Exception> CheckedObjLongConsumer.Adapter<T, EX> of(
+			ObjLongConsumer<T> consumer) {
+		return consumer::accept;
+	}
+	
+	public static <EX extends Exception> CheckedLongSupplier.Helper<EX> longSupplier(
+			CheckedLongSupplier.Helper<EX> supplier) {
+		return supplier;
+	}
+	
+	public static <EX extends Exception> CheckedLongSupplier.Adapter<EX> of(
+			LongSupplier supplier) {
+		return supplier::getAsLong;
 	}
 	
 	public static <R, EX extends Exception> CheckedLongFunction.Helper<R, EX> longFunction(
@@ -320,13 +408,13 @@ public class Checked {
 	}
 	
 	public static <EX extends Exception> CheckedDoubleConsumer.Helper<EX> doubleConsumer(
-			CheckedDoubleConsumer.Helper<EX> predicate) {
-		return predicate;
+			CheckedDoubleConsumer.Helper<EX> consumer) {
+		return consumer;
 	}
 	
 	public static <EX extends Exception> CheckedDoubleConsumer.Adapter<EX> of(
-			DoubleConsumer predicate) {
-		return predicate::accept;
+			DoubleConsumer consumer) {
+		return consumer::accept;
 	}
 	
 	public static <T, U, EX extends Exception> CheckedToDoubleBiFunction.Helper<T, U, EX> toDoubleBiFunction(
@@ -340,13 +428,33 @@ public class Checked {
 	}
 	
 	public static <EX extends Exception> CheckedDoubleBinaryOperator.Helper<EX> doubleBinaryOperator(
-			CheckedDoubleBinaryOperator.Helper<EX> function) {
-		return function;
+			CheckedDoubleBinaryOperator.Helper<EX> operator) {
+		return operator;
 	}
 	
 	public static <EX extends Exception> CheckedDoubleBinaryOperator.Adapter<EX> of(
-			DoubleBinaryOperator function) {
-		return function::applyAsDouble;
+			DoubleBinaryOperator operator) {
+		return operator::applyAsDouble;
+	}
+	
+	public static <T, EX extends Exception> CheckedObjDoubleConsumer.Helper<T, EX> objDoubleConsumer(
+			CheckedObjDoubleConsumer.Helper<T, EX> consumer) {
+		return consumer;
+	}
+	
+	public static <T, EX extends Exception> CheckedObjDoubleConsumer.Adapter<T, EX> of(
+			ObjDoubleConsumer<T> consumer) {
+		return consumer::accept;
+	}
+	
+	public static <EX extends Exception> CheckedDoubleSupplier.Helper<EX> doubleSupplier(
+			CheckedDoubleSupplier.Helper<EX> supplier) {
+		return supplier;
+	}
+	
+	public static <EX extends Exception> CheckedDoubleSupplier.Adapter<EX> of(
+			DoubleSupplier supplier) {
+		return supplier::getAsDouble;
 	}
 	
 	public static <R, EX extends Exception> CheckedDoubleFunction.Helper<R, EX> doubleFunction(
