@@ -9,7 +9,6 @@ import java.util.OptionalDouble;
 import java.util.OptionalLong;
 import java.util.PrimitiveIterator;
 import java.util.Spliterator;
-import java.util.function.LongUnaryOperator;
 import java.util.stream.LongStream;
 
 import be.gyrbo.checked.function.CheckedBiConsumer;
@@ -19,6 +18,7 @@ import be.gyrbo.checked.function.CheckedLongFunction;
 import be.gyrbo.checked.function.CheckedLongPredicate;
 import be.gyrbo.checked.function.CheckedLongToDoubleFunction;
 import be.gyrbo.checked.function.CheckedLongToIntFunction;
+import be.gyrbo.checked.function.CheckedLongUnaryOperator;
 import be.gyrbo.checked.function.CheckedObjLongConsumer;
 import be.gyrbo.checked.function.CheckedSupplier;
 
@@ -119,8 +119,8 @@ public class CheckedLongStream<EX extends Exception> extends CheckedBaseStream<L
 		return fromStream(delegate.filter(p0.sneakyThrow()));
 	}
 
-	public CheckedLongStream<EX> map(LongUnaryOperator p0) {
-		return fromStream(delegate.map(p0));
+	public CheckedLongStream<EX> map(CheckedLongUnaryOperator<EX> p0) {
+		return fromStream(delegate.map(p0.sneakyThrow()));
 	}
 
 	public <U> CheckedStream<U, EX> mapToObj(CheckedLongFunction<? extends U, EX> p0) {

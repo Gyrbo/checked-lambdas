@@ -4,91 +4,11 @@
 
 package be.gyrbo.checked;
 
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.BinaryOperator;
-import java.util.function.BooleanSupplier;
-import java.util.function.Consumer;
-import java.util.function.DoubleBinaryOperator;
-import java.util.function.DoubleConsumer;
-import java.util.function.DoubleFunction;
-import java.util.function.DoublePredicate;
-import java.util.function.DoubleSupplier;
-import java.util.function.DoubleToIntFunction;
-import java.util.function.DoubleToLongFunction;
-import java.util.function.Function;
-import java.util.function.IntBinaryOperator;
-import java.util.function.IntConsumer;
-import java.util.function.IntFunction;
-import java.util.function.IntPredicate;
-import java.util.function.IntSupplier;
-import java.util.function.IntToDoubleFunction;
-import java.util.function.IntToLongFunction;
-import java.util.function.LongBinaryOperator;
-import java.util.function.LongConsumer;
-import java.util.function.LongFunction;
-import java.util.function.LongPredicate;
-import java.util.function.LongSupplier;
-import java.util.function.LongToDoubleFunction;
-import java.util.function.LongToIntFunction;
-import java.util.function.ObjDoubleConsumer;
-import java.util.function.ObjIntConsumer;
-import java.util.function.ObjLongConsumer;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-import java.util.function.ToDoubleBiFunction;
-import java.util.function.ToDoubleFunction;
-import java.util.function.ToIntBiFunction;
-import java.util.function.ToIntFunction;
-import java.util.function.ToLongBiFunction;
-import java.util.function.ToLongFunction;
-import java.util.stream.DoubleStream;
-import java.util.stream.IntStream;
-import java.util.stream.LongStream;
-import java.util.stream.Stream;
+import java.util.function.*;
+import java.util.stream.*;
 
-import be.gyrbo.checked.function.CheckedBiConsumer;
-import be.gyrbo.checked.function.CheckedBiFunction;
-import be.gyrbo.checked.function.CheckedBinaryOperator;
-import be.gyrbo.checked.function.CheckedBooleanSupplier;
-import be.gyrbo.checked.function.CheckedConsumer;
-import be.gyrbo.checked.function.CheckedDoubleBinaryOperator;
-import be.gyrbo.checked.function.CheckedDoubleConsumer;
-import be.gyrbo.checked.function.CheckedDoubleFunction;
-import be.gyrbo.checked.function.CheckedDoublePredicate;
-import be.gyrbo.checked.function.CheckedDoubleSupplier;
-import be.gyrbo.checked.function.CheckedDoubleToIntFunction;
-import be.gyrbo.checked.function.CheckedDoubleToLongFunction;
-import be.gyrbo.checked.function.CheckedFunction;
-import be.gyrbo.checked.function.CheckedIntBinaryOperator;
-import be.gyrbo.checked.function.CheckedIntConsumer;
-import be.gyrbo.checked.function.CheckedIntFunction;
-import be.gyrbo.checked.function.CheckedIntPredicate;
-import be.gyrbo.checked.function.CheckedIntSupplier;
-import be.gyrbo.checked.function.CheckedIntToDoubleFunction;
-import be.gyrbo.checked.function.CheckedIntToLongFunction;
-import be.gyrbo.checked.function.CheckedLongBinaryOperator;
-import be.gyrbo.checked.function.CheckedLongConsumer;
-import be.gyrbo.checked.function.CheckedLongFunction;
-import be.gyrbo.checked.function.CheckedLongPredicate;
-import be.gyrbo.checked.function.CheckedLongSupplier;
-import be.gyrbo.checked.function.CheckedLongToDoubleFunction;
-import be.gyrbo.checked.function.CheckedLongToIntFunction;
-import be.gyrbo.checked.function.CheckedObjDoubleConsumer;
-import be.gyrbo.checked.function.CheckedObjIntConsumer;
-import be.gyrbo.checked.function.CheckedObjLongConsumer;
-import be.gyrbo.checked.function.CheckedPredicate;
-import be.gyrbo.checked.function.CheckedSupplier;
-import be.gyrbo.checked.function.CheckedToDoubleBiFunction;
-import be.gyrbo.checked.function.CheckedToDoubleFunction;
-import be.gyrbo.checked.function.CheckedToIntBiFunction;
-import be.gyrbo.checked.function.CheckedToIntFunction;
-import be.gyrbo.checked.function.CheckedToLongBiFunction;
-import be.gyrbo.checked.function.CheckedToLongFunction;
-import be.gyrbo.checked.stream.CheckedDoubleStream;
-import be.gyrbo.checked.stream.CheckedIntStream;
-import be.gyrbo.checked.stream.CheckedLongStream;
-import be.gyrbo.checked.stream.CheckedStream;
+import be.gyrbo.checked.function.*;
+import be.gyrbo.checked.stream.*;
 
 public class Checked {
 	public static <T, EX extends Exception> CheckedStream<T, EX> of(Stream<T> stream, Class<EX> exception) {
@@ -175,6 +95,16 @@ public class Checked {
 	public static <T, EX extends Exception> CheckedSupplier.Adapter<T, EX> of(
 			Supplier<T> supplier) {
 		return supplier::get;
+	}
+	
+	public static <T, EX extends Exception> CheckedUnaryOperator.Helper<T, EX> unaryOperator(
+			CheckedUnaryOperator.Helper<T, EX> operator) {
+		return operator;
+	}
+	
+	public static <T, EX extends Exception> CheckedUnaryOperator.Adapter<T, EX> of(
+			UnaryOperator<T> operator) {
+		return operator::apply;
 	}
 	
 	public static <T, R, EX extends Exception> CheckedFunction.Helper<T, R, EX> function(
@@ -277,6 +207,16 @@ public class Checked {
 		return supplier::getAsInt;
 	}
 	
+	public static <EX extends Exception> CheckedIntUnaryOperator.Helper<EX> intUnaryOperator(
+			CheckedIntUnaryOperator.Helper<EX> operator) {
+		return operator;
+	}
+	
+	public static <EX extends Exception> CheckedIntUnaryOperator.Adapter<EX> of(
+			IntUnaryOperator operator) {
+		return operator::applyAsInt;
+	}
+	
 	public static <R, EX extends Exception> CheckedIntFunction.Helper<R, EX> intFunction(
 			CheckedIntFunction.Helper<R, EX> function) {
 		return function;
@@ -367,6 +307,16 @@ public class Checked {
 		return supplier::getAsLong;
 	}
 	
+	public static <EX extends Exception> CheckedLongUnaryOperator.Helper<EX> longUnaryOperator(
+			CheckedLongUnaryOperator.Helper<EX> operator) {
+		return operator;
+	}
+	
+	public static <EX extends Exception> CheckedLongUnaryOperator.Adapter<EX> of(
+			LongUnaryOperator operator) {
+		return operator::applyAsLong;
+	}
+	
 	public static <R, EX extends Exception> CheckedLongFunction.Helper<R, EX> longFunction(
 			CheckedLongFunction.Helper<R, EX> function) {
 		return function;
@@ -455,6 +405,16 @@ public class Checked {
 	public static <EX extends Exception> CheckedDoubleSupplier.Adapter<EX> of(
 			DoubleSupplier supplier) {
 		return supplier::getAsDouble;
+	}
+	
+	public static <EX extends Exception> CheckedDoubleUnaryOperator.Helper<EX> doubleUnaryOperator(
+			CheckedDoubleUnaryOperator.Helper<EX> operator) {
+		return operator;
+	}
+	
+	public static <EX extends Exception> CheckedDoubleUnaryOperator.Adapter<EX> of(
+			DoubleUnaryOperator operator) {
+		return operator::applyAsDouble;
 	}
 	
 	public static <R, EX extends Exception> CheckedDoubleFunction.Helper<R, EX> doubleFunction(

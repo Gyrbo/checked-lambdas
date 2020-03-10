@@ -8,7 +8,6 @@ import java.util.DoubleSummaryStatistics;
 import java.util.OptionalDouble;
 import java.util.PrimitiveIterator;
 import java.util.Spliterator;
-import java.util.function.DoubleUnaryOperator;
 import java.util.stream.DoubleStream;
 
 import be.gyrbo.checked.function.CheckedBiConsumer;
@@ -18,6 +17,7 @@ import be.gyrbo.checked.function.CheckedDoubleFunction;
 import be.gyrbo.checked.function.CheckedDoublePredicate;
 import be.gyrbo.checked.function.CheckedDoubleToIntFunction;
 import be.gyrbo.checked.function.CheckedDoubleToLongFunction;
+import be.gyrbo.checked.function.CheckedDoubleUnaryOperator;
 import be.gyrbo.checked.function.CheckedObjDoubleConsumer;
 import be.gyrbo.checked.function.CheckedSupplier;
 
@@ -118,8 +118,8 @@ public class CheckedDoubleStream<EX extends Exception> extends CheckedBaseStream
 		return fromStream(delegate.filter(p0.sneakyThrow()));
 	}
 
-	public CheckedDoubleStream<EX> map(DoubleUnaryOperator p0) {
-		return fromStream(delegate.map(p0));
+	public CheckedDoubleStream<EX> map(CheckedDoubleUnaryOperator<EX> p0) {
+		return fromStream(delegate.map(p0.sneakyThrow()));
 	}
 
 	public <U> CheckedStream<U, EX> mapToObj(CheckedDoubleFunction<? extends U, EX> p0) {
