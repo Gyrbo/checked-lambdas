@@ -9,12 +9,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.text.ParseException;
-import java.util.OptionalInt;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
+
+import be.gyrbo.checked.util.CheckedOptionalInt;
 
 public class CheckStreamTest {
 
@@ -53,7 +54,7 @@ public class CheckStreamTest {
 	
 	@Test
 	public void testReduce() throws ParseException {
-		OptionalInt sum = Checked.of(Stream.of("1", "2", "3"), ParseException.class)
+		CheckedOptionalInt sum = Checked.of(Stream.of("1", "2", "3"), ParseException.class)
 				.mapToInt(Checked.<String, NumberFormatException>toIntFunction(Integer::parseInt)
 						.rethrow(e -> new ParseException(e.getMessage(), 0)))
 				.reduce(Checked.intBinaryOperator((a, b) -> a + b));
