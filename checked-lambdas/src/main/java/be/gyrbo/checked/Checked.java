@@ -37,6 +37,16 @@ public class Checked {
 		return supplier::getAsBoolean;
 	}
 	
+	public static <T, U, EX extends Exception> CheckedBiPredicate.Helper<T, U, EX> biPredicate(
+			CheckedBiPredicate.Helper<T, U, EX> predicate) {
+		return predicate;
+	}
+	
+	public static <T, U, EX extends Exception> CheckedBiPredicate.Adapter<T, U, EX> of(
+			BiPredicate<T, U> predicate) {
+		return predicate::test;
+	}
+	
 	public static <T, EX extends Exception> CheckedPredicate.Helper<T, EX> predicate(
 			CheckedPredicate.Helper<T, EX> predicate) {
 		return predicate;
