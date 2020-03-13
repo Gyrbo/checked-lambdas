@@ -7,26 +7,24 @@ import java.util.stream.Stream;
 
 public class CheckedBaseStream<S, EX extends Exception> {
 	protected final S delegate;
-	protected final Class<EX> exception;
 	
-	protected CheckedBaseStream(S delegate, Class<EX> exception) {
+	protected CheckedBaseStream(S delegate) {
 		this.delegate = delegate;
-		this.exception = exception;
 	}
 	
 	protected <U> CheckedStream<U, EX> fromStream(Stream<U> delegate) {
-		return new CheckedStream<U, EX>(delegate, exception);
+		return new CheckedStream<U, EX>(delegate);
 	}
 	
 	protected CheckedIntStream<EX> fromStream(IntStream delegate) {
-		return new CheckedIntStream<EX>(delegate, exception);
+		return new CheckedIntStream<EX>(delegate);
 	}
 	
 	protected CheckedLongStream<EX> fromStream(LongStream delegate) {
-		return new CheckedLongStream<EX>(delegate, exception);
+		return new CheckedLongStream<EX>(delegate);
 	}
 	
 	protected CheckedDoubleStream<EX> fromStream(DoubleStream delegate) {
-		return new CheckedDoubleStream<EX>(delegate, exception);
+		return new CheckedDoubleStream<EX>(delegate);
 	}
 }

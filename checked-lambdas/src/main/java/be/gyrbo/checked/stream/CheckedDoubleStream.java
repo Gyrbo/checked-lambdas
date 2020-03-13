@@ -23,12 +23,12 @@ import be.gyrbo.checked.util.CheckedOptionalDouble;
 
 public class CheckedDoubleStream<EX extends Exception> extends CheckedBaseStream<DoubleStream, EX> {
 	
-	protected CheckedDoubleStream(DoubleStream delegate, Class<EX> exception) {
-		super(delegate, exception);
+	protected CheckedDoubleStream(DoubleStream delegate) {
+		super(delegate);
 	}
 	
-	public static <T, EX extends Exception> CheckedDoubleStream<EX> of(DoubleStream delegate, Class<EX> exception) {
-		return new CheckedDoubleStream<EX>(delegate, exception);
+	public static <T, EX extends Exception> CheckedDoubleStream<EX> of(DoubleStream delegate) {
+		return new CheckedDoubleStream<EX>(delegate);
 	}
 	
 	// Terminal operations

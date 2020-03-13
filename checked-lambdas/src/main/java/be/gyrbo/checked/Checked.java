@@ -110,19 +110,19 @@ import be.gyrbo.checked.util.CheckedOptionalLong;
 
 public class Checked {
 	public static <T, EX extends Exception> CheckedStream<T, EX> of(Stream<T> stream, Class<EX> exception) {
-		return CheckedStream.of(stream, exception);
+		return CheckedStream.of(stream);
 	}
 
 	public static <EX extends Exception> CheckedIntStream<EX> of(IntStream stream, Class<EX> exception) {
-		return CheckedIntStream.of(stream, exception);
+		return CheckedIntStream.of(stream);
 	}
 
 	public static <EX extends Exception> CheckedLongStream<EX> of(LongStream stream, Class<EX> exception) {
-		return CheckedLongStream.of(stream, exception);
+		return CheckedLongStream.of(stream);
 	}
 
 	public static <EX extends Exception> CheckedDoubleStream<EX> of(DoubleStream stream, Class<EX> exception) {
-		return CheckedDoubleStream.of(stream, exception);
+		return CheckedDoubleStream.of(stream);
 	}
 
 	public static <EX extends Exception> CheckedBooleanSupplier.Helper<EX> booleanSupplier(

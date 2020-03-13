@@ -26,12 +26,12 @@ import be.gyrbo.checked.util.CheckedOptional;
 
 public class CheckedStream<T, EX extends Exception> extends CheckedBaseStream<Stream<T>, EX> {
 	
-	protected CheckedStream(Stream<T> delegate, Class<EX> exception) {
-		super(delegate, exception);
+	protected CheckedStream(Stream<T> delegate) {
+		super(delegate);
 	}
 	
-	public static <T, EX extends Exception> CheckedStream<T, EX> of(Stream<T> delegate, Class<EX> exception) {
-		return new CheckedStream<T, EX>(delegate, exception);
+	public static <T, EX extends Exception> CheckedStream<T, EX> of(Stream<T> delegate) {
+		return new CheckedStream<T, EX>(delegate);
 	}
 	
 	// Terminal operations

@@ -24,12 +24,12 @@ import be.gyrbo.checked.util.CheckedOptionalLong;
 
 public class CheckedLongStream<EX extends Exception> extends CheckedBaseStream<LongStream, EX> {
 	
-	protected CheckedLongStream(LongStream delegate, Class<EX> exception) {
-		super(delegate, exception);
+	protected CheckedLongStream(LongStream delegate) {
+		super(delegate);
 	}
 	
-	public static <T, EX extends Exception> CheckedLongStream<EX> of(LongStream delegate, Class<EX> exception) {
-		return new CheckedLongStream<EX>(delegate, exception);
+	public static <T, EX extends Exception> CheckedLongStream<EX> of(LongStream delegate) {
+		return new CheckedLongStream<EX>(delegate);
 	}
 	
 	// Terminal operations
