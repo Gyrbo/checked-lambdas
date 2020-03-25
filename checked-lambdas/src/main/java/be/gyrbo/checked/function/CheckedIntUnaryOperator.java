@@ -93,6 +93,19 @@ public interface CheckedIntUnaryOperator<EX extends Exception> {
 		}
 		
 		/**
+		 * In case an exception occurs, the identity transform will be applied.
+		 */
+		default CheckedIntUnaryOperator.Adapter<EX> orIdentity() {
+			return t -> {
+				try {
+					return applyOrThrow(t);
+				} catch (Exception e) {
+					return t;
+				}
+			};
+		}
+		
+		/**
 		 * Rethrow any checked exceptions as unchecked exceptions by passing through the supplied mapper. 
 		 */
 		default CheckedIntUnaryOperator.Adapter<EX> rethrowUnchecked(Function<? super EX, ? extends RuntimeException> mapper) {
