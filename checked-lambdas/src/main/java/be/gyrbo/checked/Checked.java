@@ -4,6 +4,9 @@
 
 package be.gyrbo.checked;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
@@ -103,6 +106,9 @@ import be.gyrbo.checked.stream.CheckedDoubleStream;
 import be.gyrbo.checked.stream.CheckedIntStream;
 import be.gyrbo.checked.stream.CheckedLongStream;
 import be.gyrbo.checked.stream.CheckedStream;
+import be.gyrbo.checked.util.CheckedCollection;
+import be.gyrbo.checked.util.CheckedList;
+import be.gyrbo.checked.util.CheckedMap;
 import be.gyrbo.checked.util.CheckedOptional;
 import be.gyrbo.checked.util.CheckedOptionalDouble;
 import be.gyrbo.checked.util.CheckedOptionalInt;
@@ -571,4 +577,16 @@ public class Checked {
 		return function::applyAsLong;
 	}
 	
+	public static <K, V> CheckedMap<K, V> of(Map<K, V> map) {
+		return CheckedMap.of(map);
+	}
+
+	public static <T> CheckedList<T> of(List<T> list) {
+		return CheckedList.of(list);
+	}
+
+	public static <T> CheckedCollection<T> of(Collection<T> collection) {
+		return CheckedCollection.of(collection);
+	}
+
 }

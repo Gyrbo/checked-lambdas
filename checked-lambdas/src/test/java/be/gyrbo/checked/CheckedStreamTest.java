@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 
 import be.gyrbo.checked.util.CheckedOptionalInt;
 
-public class CheckStreamTest {
+public class CheckedStreamTest {
 
 	@Test
 	public void testFilterPredicate() throws ParseException {
