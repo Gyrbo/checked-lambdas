@@ -47,12 +47,27 @@ public interface CheckedObjIntConsumer<T, EX extends Exception> {
 	public interface Helper<T, EX extends Exception> extends CheckedObjIntConsumer<T, EX> {
 		
 		/**
-		 * In case an exception occurs, don't do anything specific
+		 * In case any exception occurs, don't do anything specific
+		 */
+		default CheckedObjIntConsumer.Adapter<T,  EX> ignoreAll() {
+			return (t, u) -> {
+				try {
+					acceptOrThrow(t, u);
+				} catch (Exception e) {
+					// Ignore
+				}
+			};
+		}
+		
+		/**
+		 * In case a checked exception occurs, don't do anything specific
 		 */
 		default CheckedObjIntConsumer.Adapter<T,  EX> ignore() {
 			return (t, u) -> {
 				try {
 					acceptOrThrow(t, u);
+				} catch(RuntimeException e) {
+					throw e;
 				} catch (Exception e) {
 					// Ignore
 				}

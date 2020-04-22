@@ -49,12 +49,27 @@ public interface CheckedLongConsumer<EX extends Exception> {
 		// Convert to a regular Consumer
 		
 		/**
-		 * In case an exception occurs, an empty Optional is returned
+		 * In case an exception occurs, don't do anything specific
+		 */
+		default CheckedLongConsumer.Adapter<EX> ignoreAll() {
+			return t -> {
+				try {
+					acceptOrThrow(t);
+				} catch (Exception e) {
+					// Ignore
+				}
+			};
+		}
+		
+		/**
+		 * In case an exception occurs, don't do anything specific
 		 */
 		default CheckedLongConsumer.Adapter<EX> ignore() {
 			return t -> {
 				try {
 					acceptOrThrow(t);
+				} catch(RuntimeException e) {
+					throw e;
 				} catch (Exception e) {
 					// Ignore
 				}
@@ -229,13 +244,10 @@ public interface CheckedLongConsumer<EX extends Exception> {
 				try {
 					acceptOrThrow(t);
 				} catch(Exception e) {
-					other.acceptOrThrow(t);
-					
-					// Don't execute other.acceptOrThrow() a seconds time
-					return;
+					// Ignore
 				}
 				
-				other.acceptOrThrow(t);					
+				other.acceptOrThrow(t);
 	        };
 	    }
 	}

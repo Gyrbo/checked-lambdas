@@ -47,12 +47,27 @@ public interface CheckedBiConsumer<T, U, EX extends Exception> {
 	public interface Helper<T, U, EX extends Exception> extends CheckedBiConsumer<T, U, EX> {
 		
 		/**
-		 * In case an exception occurs, don't do anything specific
+		 * In case any exception occurs, don't do anything specific
+		 */
+		default CheckedBiConsumer.Adapter<T, U,  EX> ignoreAll() {
+			return (t, u) -> {
+				try {
+					acceptOrThrow(t, u);
+				} catch (Exception e) {
+					// Ignore
+				}
+			};
+		}
+		
+		/**
+		 * In case a checked exception occurs, don't do anything specific
 		 */
 		default CheckedBiConsumer.Adapter<T, U,  EX> ignore() {
 			return (t, u) -> {
 				try {
 					acceptOrThrow(t, u);
+				} catch(RuntimeException e) {
+					throw e;
 				} catch (Exception e) {
 					// Ignore
 				}
