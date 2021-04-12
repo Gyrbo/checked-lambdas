@@ -147,6 +147,10 @@ public class CheckedIntStream<EX extends Exception> extends CheckedBaseStream<In
 		return fromStream(delegate.flatMap(p0.sneakyThrow()));
 	}
 
+	public CheckedIntStream<EX> flatMapChecked(CheckedIntFunction<? extends CheckedIntStream<EX>, EX> p0) {
+		return fromStream(delegate.flatMap(t -> p0.sneakyThrow().apply(t).delegate));
+	}
+
 	public CheckedDoubleStream<EX> mapToDouble(CheckedIntToDoubleFunction<EX> p0) {
 		return fromStream(delegate.mapToDouble(p0.sneakyThrow()));
 	}

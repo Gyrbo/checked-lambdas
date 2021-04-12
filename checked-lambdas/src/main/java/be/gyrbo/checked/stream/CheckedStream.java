@@ -139,16 +139,32 @@ public class CheckedStream<T, EX extends Exception> extends CheckedBaseStream<St
 		return fromStream(delegate.flatMap(p0.sneakyThrow()));
 	}
 
+	public <R> CheckedStream<R, EX> flatMapChecked(CheckedFunction<? super T, ? extends CheckedStream<? extends R, EX>, EX> p0) {
+		return fromStream(delegate.flatMap(t -> p0.sneakyThrow().apply(t).delegate));
+	}
+
 	public CheckedDoubleStream<EX> flatMapToDouble(CheckedFunction<? super T, ? extends DoubleStream, EX> p0) {
 		return fromStream(delegate.flatMapToDouble(p0.sneakyThrow()));
+	}
+
+	public CheckedDoubleStream<EX> flatMapToDoubleChecked(CheckedFunction<? super T, ? extends CheckedDoubleStream<EX>, EX> p0) {
+		return fromStream(delegate.flatMapToDouble(t -> p0.sneakyThrow().apply(t).delegate));
 	}
 
 	public CheckedIntStream<EX> flatMapToInt(CheckedFunction<? super T, ? extends IntStream, EX> p0) {
 		return fromStream(delegate.flatMapToInt(p0.sneakyThrow()));
 	}
 
+	public CheckedIntStream<EX> flatMapToIntChecked(CheckedFunction<? super T, ? extends CheckedIntStream<EX>, EX> p0) {
+		return fromStream(delegate.flatMapToInt(t -> p0.sneakyThrow().apply(t).delegate));
+	}
+
 	public CheckedLongStream<EX> flatMapToLong(CheckedFunction<? super T, ? extends LongStream, EX> p0) {
 		return fromStream(delegate.flatMapToLong(p0.sneakyThrow()));
+	}
+
+	public CheckedLongStream<EX> flatMapToLongChecked(CheckedFunction<? super T, ? extends CheckedLongStream<EX>, EX> p0) {
+		return fromStream(delegate.flatMapToLong(t -> p0.sneakyThrow().apply(t).delegate));
 	}
 
 	public CheckedDoubleStream<EX> mapToDouble(CheckedToDoubleFunction<? super T, EX> p0) {

@@ -147,6 +147,10 @@ public class CheckedLongStream<EX extends Exception> extends CheckedBaseStream<L
 		return fromStream(delegate.flatMap(p0.sneakyThrow()));
 	}
 
+	public CheckedLongStream<EX> flatMapChecked(CheckedLongFunction<? extends CheckedLongStream<EX>, EX> p0) {
+		return fromStream(delegate.flatMap(t -> p0.sneakyThrow().apply(t).delegate));
+	}
+
 	public CheckedDoubleStream<EX> mapToDouble(CheckedLongToDoubleFunction<EX> p0) {
 		return fromStream(delegate.mapToDouble(p0.sneakyThrow()));
 	}
